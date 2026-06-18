@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/app/lib/supabase";
 import { Plus, Image as ImageIcon, Video, Trash2, Edit, XCircle, Loader2 } from "lucide-react";
 import Image from "next/image";
+import toast from "react-hot-toast";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -13,18 +14,20 @@ export default function AdminNews() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [editingArticle, setEditingArticle] = useState<any | null>(null);
+
+  async function fetchArticles() {
+    setLoading(true);
+    const { data } = await supabase
+      .from("news")
+      .select("*")
+      .order("created_at", { ascending: false });
+    
+    if (data) setArticles(data);
+    setLoading(false);
+  }
 
   useEffect(() => {
-    async function fetchArticles() {
-      setLoading(true);
-      const { data } = await supabase
-        .from("news")
-        .select("*")
-        .order("created_at", { ascending: false });
-      
-      if (data) setArticles(data);
-      setLoading(false);
-    }
     fetchArticles();
   }, []);
 
@@ -33,7 +36,7 @@ export default function AdminNews() {
     setSaving(true);
     const form = new FormData(e.currentTarget);
     
-    let image_url = null;
+    let image_url = editingArticle ? editingArticle.image_url : null;
     if (selectedFile) {
       const fileExt = selectedFile.name.split('.').pop();
       const fileName = `${Math.random()}.${fileExt}`;
@@ -48,32 +51,54 @@ export default function AdminNews() {
           .from('nect-media')
           .getPublicUrl(filePath);
         image_url = publicUrlData.publicUrl;
+      } else {
+        toast.error("Error uploading image");
+        setSaving(false);
+        return;
       }
     }
     
-    const { error } = await supabase.from("news").insert({
+    const articleData = {
       title: form.get("title"),
       category: form.get("category"),
       excerpt: form.get("excerpt"),
       content: form.get("content"),
       featured: form.get("featured") === "on",
       image_url: image_url
-    });
+    };
+
+    let error;
+    
+    if (editingArticle) {
+      const { error: updateError } = await supabase
+        .from("news")
+        .update(articleData)
+        .eq("id", editingArticle.id);
+      error = updateError;
+    } else {
+      const { error: insertError } = await supabase
+        .from("news")
+        .insert(articleData);
+      error = insertError;
+    }
 
     setSaving(false);
     if (!error) {
+      toast.success(editingArticle ? "Article updated successfully!" : "Article published successfully!");
       setIsModalOpen(false);
+      setEditingArticle(null);
       setSelectedFile(null);
-      window.location.reload(); 
+      fetchArticles(); 
     } else {
-      alert("Error saving news article: " + error.message);
+      toast.error("Error saving news article: " + error.message);
     }
   }
 
   async function deleteArticle(id: string) {
     if (confirm("Are you sure you want to delete this article?")) {
       await supabase.from("news").delete().eq("id", id);
-      window.location.reload();
+      toast.success("Article deleted!");
+      fetchArticles();
     }
   }
 
@@ -82,7 +107,10 @@ export default function AdminNews() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h1 className="text-2xl font-bold text-slate-900">News & Media Management</h1>
         <button 
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => {
+            setEditingArticle(null);
+            setIsModalOpen(true);
+          }}
           className="flex items-center gap-2 px-4 py-2 rounded-lg bg-brand-primary text-white text-sm font-bold hover:bg-brand-primary/90 transition-colors"
         >
           <Plus className="h-4 w-4" />
@@ -119,7 +147,14 @@ export default function AdminNews() {
                 <p className="text-sm text-slate-600 line-clamp-2 mb-4 flex-1">{article.excerpt}</p>
                 
                 <div className="flex items-center justify-end gap-2 pt-4 border-t border-slate-100">
-                  <button title="Edit" onClick={() => setIsModalOpen(true)} className="p-2 text-slate-400 hover:text-brand-primary rounded-md hover:bg-brand-primary/10 transition-colors">
+                  <button 
+                    title="Edit" 
+                    onClick={() => {
+                      setEditingArticle(article);
+                      setIsModalOpen(true);
+                    }} 
+                    className="p-2 text-slate-400 hover:text-brand-primary rounded-md hover:bg-brand-primary/10 transition-colors"
+                  >
                     <Edit className="h-4 w-4" />
                   </button>
                   <button 
@@ -141,8 +176,10 @@ export default function AdminNews() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
             <div className="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between z-10">
-              <h2 className="text-xl font-bold text-slate-900">Publish New Article</h2>
-              <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600">
+              <h2 className="text-xl font-bold text-slate-900">
+                {editingArticle ? "Edit Article" : "Publish New Article"}
+              </h2>
+              <button onClick={() => { setIsModalOpen(false); setEditingArticle(null); }} className="text-slate-400 hover:text-slate-600">
                 <XCircle className="h-6 w-6" />
               </button>
             </div>
@@ -151,13 +188,13 @@ export default function AdminNews() {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">Article Title</label>
-                  <input name="title" required className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-brand-primary focus:ring-1 focus:ring-brand-primary outline-none" />
+                  <input name="title" required defaultValue={editingArticle?.title || ""} className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-brand-primary focus:ring-1 focus:ring-brand-primary outline-none" />
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1">Category</label>
-                    <select name="category" required className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-brand-primary outline-none bg-white">
+                    <select name="category" required defaultValue={editingArticle?.category || "Operations"} className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-brand-primary outline-none bg-white">
                       <option value="Operations">Operations</option>
                       <option value="Policy">Policy</option>
                       <option value="Enforcement">Enforcement</option>
@@ -166,7 +203,7 @@ export default function AdminNews() {
                   </div>
                   <div className="flex items-center mt-6">
                     <label className="flex items-center gap-2 cursor-pointer">
-                      <input type="checkbox" name="featured" className="w-4 h-4 rounded border-slate-300 text-brand-primary focus:ring-brand-primary" />
+                      <input type="checkbox" name="featured" defaultChecked={editingArticle?.featured || false} className="w-4 h-4 rounded border-slate-300 text-brand-primary focus:ring-brand-primary" />
                       <span className="text-sm font-medium text-slate-700">Set as Featured Article</span>
                     </label>
                   </div>
@@ -174,7 +211,7 @@ export default function AdminNews() {
 
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">Short Excerpt</label>
-                  <textarea name="excerpt" required rows={2} className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-brand-primary outline-none resize-none"></textarea>
+                  <textarea name="excerpt" required rows={2} defaultValue={editingArticle?.excerpt || ""} className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-brand-primary outline-none resize-none"></textarea>
                 </div>
 
                 <div>
@@ -192,7 +229,7 @@ export default function AdminNews() {
                       <button type="button" className="p-1.5 hover:bg-slate-200 rounded text-slate-600 text-xs">List</button>
                       <button type="button" className="p-1.5 hover:bg-slate-200 rounded text-slate-600 text-xs">Link</button>
                     </div>
-                    <textarea name="content" required rows={12} placeholder="Write the article content here..." className="w-full px-4 py-3 outline-none resize-y"></textarea>
+                    <textarea name="content" required rows={12} defaultValue={editingArticle?.content || ""} placeholder="Write the article content here..." className="w-full px-4 py-3 outline-none resize-y"></textarea>
                   </div>
                 </div>
 
@@ -220,12 +257,12 @@ export default function AdminNews() {
               </div>
 
               <div className="pt-4 border-t border-slate-200 flex justify-end gap-3">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="px-6 py-2 rounded-lg border border-slate-300 text-slate-700 font-medium hover:bg-slate-50">
+                <button type="button" onClick={() => { setIsModalOpen(false); setEditingArticle(null); }} className="px-6 py-2 rounded-lg border border-slate-300 text-slate-700 font-medium hover:bg-slate-50">
                   Cancel
                 </button>
                 <button type="submit" disabled={saving} className="flex items-center gap-2 px-6 py-2 rounded-lg bg-brand-primary text-white font-bold hover:bg-brand-primary/90 disabled:opacity-70">
                   {saving && <Loader2 className="h-4 w-4 animate-spin" />}
-                  {saving ? "Publishing..." : "Publish Article"}
+                  {saving ? (editingArticle ? "Updating..." : "Publishing...") : (editingArticle ? "Update Article" : "Publish Article")}
                 </button>
               </div>
             </form>

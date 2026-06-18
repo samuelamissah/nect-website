@@ -5,6 +5,7 @@ import Link from "next/link";
 import { LayoutDashboard, FileText, Newspaper, Settings, LogOut, Lock, Image as ImageIcon, ShieldAlert, Video, FileArchive, Users, Home, Activity } from "lucide-react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { Toaster } from "react-hot-toast";
 
 export default function AdminLayout({
   children,
@@ -87,6 +88,7 @@ export default function AdminLayout({
 
   return (
     <div className="flex h-screen bg-slate-50 overflow-hidden">
+      <Toaster position="top-right" />
       {/* Sidebar */}
       <aside className="w-64 flex-shrink-0 border-r border-slate-200 bg-white hidden md:flex flex-col h-full">
         <div className="p-6 border-b border-slate-200">

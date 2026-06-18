@@ -102,27 +102,34 @@ export default function NewsPage() {
             {regularPosts.length > 0 && (
               <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
                 {regularPosts.map((post) => (
-                  <div key={post.id} className="group flex flex-col rounded-2xl border border-slate-200 bg-white p-8 shadow-sm transition-all hover:border-brand-primary/30 hover:shadow-lg">
-                    <div className="flex items-center gap-3 mb-6">
-                      <span className="inline-flex items-center rounded-sm bg-slate-100 px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-slate-600">
-                        {post.category || 'Update'}
-                      </span>
-                      <span className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
-                        <Calendar className="h-3 w-3" />
-                        {new Date(post.created_at).toLocaleDateString()}
-                      </span>
-                    </div>
-                    <h3 className="text-xl font-bold text-slate-900 mb-4 group-hover:text-brand-primary transition-colors">
-                      <Link href={`/news/${post.id}`} className="focus:outline-none">
-                        <span className="absolute inset-0" aria-hidden="true" />
-                        {post.title}
-                      </Link>
-                    </h3>
-                    <p className="text-slate-600 mb-8 flex-1 line-clamp-3">
-                      {post.excerpt}
-                    </p>
-                    <div className="mt-auto flex items-center gap-2 text-sm font-bold text-brand-primary">
-                      Read more <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  <div key={post.id} className="group flex flex-col rounded-2xl border border-slate-200 bg-white shadow-sm transition-all hover:border-brand-primary/30 hover:shadow-lg overflow-hidden relative">
+                    {post.image_url && (
+                      <div className="relative w-full h-48 bg-slate-100">
+                        <Image src={post.image_url} alt="" fill className="object-cover" />
+                      </div>
+                    )}
+                    <div className="p-8 flex flex-col flex-1">
+                      <div className="flex items-center gap-3 mb-6">
+                        <span className="inline-flex items-center rounded-sm bg-slate-100 px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-slate-600">
+                          {post.category || 'Update'}
+                        </span>
+                        <span className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
+                          <Calendar className="h-3 w-3" />
+                          {new Date(post.created_at).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <h3 className="text-xl font-bold text-slate-900 mb-4 group-hover:text-brand-primary transition-colors">
+                        <Link href={`/news/${post.id}`} className="focus:outline-none">
+                          <span className="absolute inset-0" aria-hidden="true" />
+                          {post.title}
+                        </Link>
+                      </h3>
+                      <p className="text-slate-600 mb-8 flex-1 line-clamp-3 relative z-10">
+                        {post.excerpt}
+                      </p>
+                      <div className="mt-auto flex items-center gap-2 text-sm font-bold text-brand-primary relative z-10">
+                        Read more <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                      </div>
                     </div>
                   </div>
                 ))}
