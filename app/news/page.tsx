@@ -92,7 +92,7 @@ export default function NewsPage() {
                   <p className="text-lg text-slate-600 mb-8 leading-relaxed">
                     {featuredPost.excerpt}
                   </p>
-                  <Link href="#" className="inline-flex items-center gap-2 text-brand-primary font-bold hover:gap-3 transition-all">
+                  <Link href={`/news/${featuredPost.id}`} className="inline-flex items-center gap-2 text-brand-primary font-bold hover:gap-3 transition-all">
                     Read Full Release <ArrowRight className="h-4 w-4" />
                   </Link>
                 </div>
@@ -113,7 +113,7 @@ export default function NewsPage() {
                       </span>
                     </div>
                     <h3 className="text-xl font-bold text-slate-900 mb-4 group-hover:text-brand-primary transition-colors">
-                      <Link href="#" className="focus:outline-none">
+                      <Link href={`/news/${post.id}`} className="focus:outline-none">
                         <span className="absolute inset-0" aria-hidden="true" />
                         {post.title}
                       </Link>

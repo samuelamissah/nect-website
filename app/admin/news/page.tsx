@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "@/app/lib/supabase";
-import { Plus, Image as ImageIcon, Video, Trash2, Edit, XCircle } from "lucide-react";
+import { Plus, Image as ImageIcon, Video, Trash2, Edit, XCircle, Loader2 } from "lucide-react";
 import Image from "next/image";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -11,6 +11,8 @@ export default function AdminNews() {
   const [articles, setArticles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   useEffect(() => {
     async function fetchArticles() {
@@ -28,10 +30,26 @@ export default function AdminNews() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setSaving(true);
     const form = new FormData(e.currentTarget);
     
-    // In a real app, handle file uploads to Supabase storage here similar to ReportForm
-    // For now, we'll just save the text data
+    let image_url = null;
+    if (selectedFile) {
+      const fileExt = selectedFile.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `news/${fileName}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('nect-media')
+        .upload(filePath, selectedFile);
+        
+      if (!uploadError) {
+        const { data: publicUrlData } = supabase.storage
+          .from('nect-media')
+          .getPublicUrl(filePath);
+        image_url = publicUrlData.publicUrl;
+      }
+    }
     
     const { error } = await supabase.from("news").insert({
       title: form.get("title"),
@@ -39,13 +57,16 @@ export default function AdminNews() {
       excerpt: form.get("excerpt"),
       content: form.get("content"),
       featured: form.get("featured") === "on",
+      image_url: image_url
     });
 
+    setSaving(false);
     if (!error) {
       setIsModalOpen(false);
-      window.location.reload(); // Simple refresh to fetch new data since fetchArticles is in useEffect
+      setSelectedFile(null);
+      window.location.reload(); 
     } else {
-      alert("Error saving news article.");
+      alert("Error saving news article: " + error.message);
     }
   }
 
@@ -180,13 +201,19 @@ export default function AdminNews() {
                   <div className="flex gap-4">
                     <label className="flex-1 cursor-pointer flex flex-col items-center justify-center p-6 border-2 border-dashed border-slate-300 rounded-xl hover:bg-slate-50 transition-colors">
                       <ImageIcon className="h-6 w-6 text-slate-400 mb-2" />
-                      <span className="text-sm font-medium text-slate-600">Upload Image</span>
-                      <input type="file" accept="image/*" className="hidden" />
-                    </label>
-                    <label className="flex-1 cursor-pointer flex flex-col items-center justify-center p-6 border-2 border-dashed border-slate-300 rounded-xl hover:bg-slate-50 transition-colors">
-                      <Video className="h-6 w-6 text-slate-400 mb-2" />
-                      <span className="text-sm font-medium text-slate-600">Upload Video</span>
-                      <input type="file" accept="video/*" className="hidden" />
+                      <span className="text-sm font-medium text-slate-600">
+                        {selectedFile ? selectedFile.name : "Upload Image"}
+                      </span>
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        className="hidden" 
+                        onChange={(e) => {
+                          if (e.target.files && e.target.files.length > 0) {
+                            setSelectedFile(e.target.files[0]);
+                          }
+                        }}
+                      />
                     </label>
                   </div>
                 </div>
@@ -196,8 +223,9 @@ export default function AdminNews() {
                 <button type="button" onClick={() => setIsModalOpen(false)} className="px-6 py-2 rounded-lg border border-slate-300 text-slate-700 font-medium hover:bg-slate-50">
                   Cancel
                 </button>
-                <button type="submit" className="px-6 py-2 rounded-lg bg-brand-primary text-white font-bold hover:bg-brand-primary/90">
-                  Publish Article
+                <button type="submit" disabled={saving} className="flex items-center gap-2 px-6 py-2 rounded-lg bg-brand-primary text-white font-bold hover:bg-brand-primary/90 disabled:opacity-70">
+                  {saving && <Loader2 className="h-4 w-4 animate-spin" />}
+                  {saving ? "Publishing..." : "Publish Article"}
                 </button>
               </div>
             </form>

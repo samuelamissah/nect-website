@@ -146,7 +146,11 @@ export default function AdminGallery() {
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg">
             <div className="border-b border-slate-200 px-6 py-4 flex items-center justify-between">
               <h2 className="text-xl font-bold text-slate-900">Upload to Gallery</h2>
-              <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600 transition-colors">
+              <button 
+                onClick={() => setIsModalOpen(false)} 
+                className="text-slate-400 hover:text-slate-600 transition-colors"
+                title="Close Modal"
+              >
                 <XCircle className="h-6 w-6" />
               </button>
             </div>
@@ -164,7 +168,7 @@ export default function AdminGallery() {
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">Media File (Image or Video)</label>
-                <input type="file" name="media_file" accept="image/*,video/*" required className="w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-brand-primary/10 file:text-brand-primary hover:file:bg-brand-primary/20 transition-colors cursor-pointer border border-slate-200 rounded-lg p-1" />
+                <input title="ewf" type="file" name="media_file" accept="image/*,video/*" required className="w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-brand-primary/10 file:text-brand-primary hover:file:bg-brand-primary/20 transition-colors cursor-pointer border border-slate-200 rounded-lg p-1" />
               </div>
 
               <div className="pt-4 border-t border-slate-200 flex justify-end gap-3">

@@ -1,18 +1,74 @@
 "use client";
 
-import { useState } from "react";
-import { Users, Plus, Edit, Trash2, Shield, Lock, Search } from "lucide-react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/app/lib/supabase";
+import { Users, Plus, Edit, Trash2, Shield, Lock, Search, Loader2, XCircle } from "lucide-react";
 
-// Mock data for demo purposes since we don't have a real auth API hooked up here
-const initialUsers = [
-  { id: 1, name: "Kwame Mensah", email: "kmensah@nect.gov.gh", role: "Super Admin", status: "Active", lastLogin: "2 hours ago" },
-  { id: 2, name: "Akosua Osei", email: "aosei@nect.gov.gh", role: "Administrator", status: "Active", lastLogin: "1 day ago" },
-  { id: 3, name: "Samuel Addo", email: "saddo@nect.gov.gh", role: "Report Officer", status: "Active", lastLogin: "3 days ago" },
-  { id: 4, name: "Ama Serwaa", email: "aserwaa@nect.gov.gh", role: "Content Editor", status: "Inactive", lastLogin: "2 weeks ago" },
-];
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 export default function AdminUsers() {
-  const [users, setUsers] = useState(initialUsers);
+  const [users, setUsers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  async function fetchUsers() {
+    setLoading(true);
+    const { data } = await supabase
+      .from("users")
+      .select("*")
+      .order("created_at", { ascending: false });
+    
+    if (data && data.length > 0) {
+      setUsers(data);
+    } else {
+      // If table is empty, insert default admin
+      const defaultUser = {
+        name: "Kwame Mensah",
+        email: "kmensah@nect.gov.gh",
+        role: "Super Admin",
+        status: "Active",
+      };
+      await supabase.from("users").insert(defaultUser);
+      setUsers([{ ...defaultUser, id: 'temp-1', last_login: new Date().toISOString() }]);
+      // fetch again to get real ID
+      const { data: newData } = await supabase.from("users").select("*");
+      if (newData) setUsers(newData);
+    }
+    setLoading(false);
+  }
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setSaving(true);
+    const form = new FormData(e.currentTarget);
+    
+    const { error } = await supabase.from("users").insert({
+      name: form.get("name"),
+      email: form.get("email"),
+      role: form.get("role"),
+      status: "Active",
+    });
+
+    setSaving(false);
+    if (!error) {
+      setIsModalOpen(false);
+      fetchUsers();
+    } else {
+      alert("Error saving user. " + error.message);
+    }
+  }
+
+  async function deleteUser(id: string) {
+    if (confirm("Are you sure you want to remove this user?")) {
+      await supabase.from("users").delete().eq("id", id);
+      fetchUsers();
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -21,7 +77,10 @@ export default function AdminUsers() {
           <h1 className="text-2xl font-bold text-slate-900">User Management</h1>
           <p className="text-sm text-slate-500 mt-1">Manage staff access, roles, and permissions.</p>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-brand-primary text-white text-sm font-bold hover:bg-brand-primary/90 transition-colors shadow-md">
+        <button 
+          onClick={() => setIsModalOpen(true)}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-brand-primary text-white text-sm font-bold hover:bg-brand-primary/90 transition-colors shadow-md"
+        >
           <Plus className="h-4 w-4" />
           Add New User
         </button>
@@ -44,59 +103,111 @@ export default function AdminUsers() {
                 <th className="px-6 py-4 font-semibold text-slate-900">User Details</th>
                 <th className="px-6 py-4 font-semibold text-slate-900">Role & Access</th>
                 <th className="px-6 py-4 font-semibold text-slate-900">Status</th>
-                <th className="px-6 py-4 font-semibold text-slate-900">Last Login</th>
+                <th className="px-6 py-4 font-semibold text-slate-900">Joined</th>
                 <th className="px-6 py-4 font-semibold text-slate-900 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {users.map((user) => (
-                <tr key={user.id} className="hover:bg-slate-50 transition-colors">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-full bg-slate-200 flex items-center justify-center font-bold text-slate-600">
-                        {user.name.split(' ').map(n => n[0]).join('')}
+              {loading ? (
+                <tr><td colSpan={5} className="px-6 py-12 text-center text-slate-500"><Loader2 className="h-6 w-6 animate-spin mx-auto mb-2 text-brand-primary" /> Loading users...</td></tr>
+              ) : users.length === 0 ? (
+                <tr><td colSpan={5} className="px-6 py-12 text-center text-slate-500">No users found.</td></tr>
+              ) : (
+                users.map((user) => (
+                  <tr key={user.id} className="hover:bg-slate-50 transition-colors">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-full bg-slate-200 flex items-center justify-center font-bold text-slate-600">
+                          {user.name ? user.name.split(' ').map((n: string) => n[0]).join('').substring(0, 2) : 'U'}
+                        </div>
+                        <div>
+                          <p className="font-bold text-slate-900">{user.name}</p>
+                          <p className="text-slate-500 text-xs">{user.email}</p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-bold text-slate-900">{user.name}</p>
-                        <p className="text-slate-500 text-xs">{user.email}</p>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2">
+                        <Shield className={`h-4 w-4 ${user.role === 'Super Admin' ? 'text-red-500' : 'text-blue-500'}`} />
+                        <span className="font-medium text-slate-700">{user.role}</span>
                       </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      <Shield className={`h-4 w-4 ${user.role === 'Super Admin' ? 'text-red-500' : 'text-blue-500'}`} />
-                      <span className="font-medium text-slate-700">{user.role}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${
-                      user.status === 'Active' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600'
-                    }`}>
-                      {user.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-slate-500 text-xs">
-                    {user.lastLogin}
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <button className="p-1.5 text-slate-400 hover:text-amber-600 rounded-md hover:bg-amber-50 transition-colors" title="Reset Password">
-                        <Lock className="h-4 w-4" />
-                      </button>
-                      <button className="p-1.5 text-slate-400 hover:text-brand-primary rounded-md hover:bg-brand-primary/10 transition-colors" title="Edit User">
-                        <Edit className="h-4 w-4" />
-                      </button>
-                      <button className="p-1.5 text-slate-400 hover:text-red-600 rounded-md hover:bg-red-50 transition-colors" title="Disable User">
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${
+                        user.status === 'Active' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600'
+                      }`}>
+                        {user.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-slate-500 text-xs">
+                      {new Date(user.created_at).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <button className="p-1.5 text-slate-400 hover:text-amber-600 rounded-md hover:bg-amber-50 transition-colors" title="Reset Password">
+                          <Lock className="h-4 w-4" />
+                        </button>
+                        <button className="p-1.5 text-slate-400 hover:text-brand-primary rounded-md hover:bg-brand-primary/10 transition-colors" title="Edit User">
+                          <Edit className="h-4 w-4" />
+                        </button>
+                        <button onClick={() => deleteUser(user.id)} className="p-1.5 text-slate-400 hover:text-red-600 rounded-md hover:bg-red-50 transition-colors" title="Disable User">
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
       </div>
+
+      {/* Modal for New User */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md">
+            <div className="border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+              <h2 className="text-xl font-bold text-slate-900">Add New User</h2>
+              <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600 transition-colors">
+                <XCircle className="h-6 w-6" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleSubmit} className="p-6 space-y-5">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Full Name</label>
+                <input name="name" required placeholder="e.g. Kwame Mensah" className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-brand-primary outline-none" />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Email Address</label>
+                <input type="email" name="email" required placeholder="user@nect.gov.gh" className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-brand-primary outline-none" />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Role & Permissions</label>
+                <select name="role" required className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-brand-primary outline-none bg-white">
+                  <option value="Report Officer">Report Officer</option>
+                  <option value="Content Editor">Content Editor</option>
+                  <option value="Administrator">Administrator</option>
+                  <option value="Super Admin">Super Admin</option>
+                </select>
+              </div>
+
+              <div className="pt-4 border-t border-slate-200 flex justify-end gap-3">
+                <button type="button" onClick={() => setIsModalOpen(false)} className="px-6 py-2 rounded-lg border border-slate-300 text-slate-700 font-medium hover:bg-slate-50">
+                  Cancel
+                </button>
+                <button type="submit" disabled={saving} className="flex items-center gap-2 px-6 py-2 rounded-lg bg-brand-primary text-white font-bold hover:bg-brand-primary/90 disabled:opacity-70">
+                  {saving && <Loader2 className="h-4 w-4 animate-spin" />}
+                  {saving ? "Saving..." : "Create User"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

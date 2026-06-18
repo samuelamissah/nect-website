@@ -18,7 +18,21 @@ export default function AdminHomepage() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    fetchContent();
+    const fetchData = async () => {
+      setLoading(true);
+      const { data } = await supabase.from("homepage_content").select("*");
+      
+      if (data && data.length > 0) {
+        const contentMap: Record<string, string> = {};
+        data.forEach(item => {
+          contentMap[item.id] = item.value;
+        });
+        setContent(prev => ({ ...prev, ...contentMap }));
+      }
+      setLoading(false);
+    };
+    
+    fetchData();
   }, []);
 
   async function fetchContent() {
@@ -92,6 +106,7 @@ export default function AdminHomepage() {
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Main Headline</label>
               <textarea 
+                title="Main Headline"
                 value={content.hero_title}
                 onChange={(e) => handleChange("hero_title", e.target.value)}
                 className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:border-brand-primary outline-none font-bold text-lg resize-none"
@@ -101,6 +116,7 @@ export default function AdminHomepage() {
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Subheadline</label>
               <textarea 
+                title="Subheadline"
                 value={content.hero_subtitle}
                 onChange={(e) => handleChange("hero_subtitle", e.target.value)}
                 className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:border-brand-primary outline-none resize-none"
@@ -118,6 +134,7 @@ export default function AdminHomepage() {
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Member Institutions</label>
               <input 
+                title="Member Institutions"
                 type="text"
                 value={content.stats_agencies}
                 onChange={(e) => handleChange("stats_agencies", e.target.value)}
@@ -127,6 +144,7 @@ export default function AdminHomepage() {
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Regional Focus</label>
               <input 
+                title="Regional Focus"
                 type="text"
                 value={content.stats_regions}
                 onChange={(e) => handleChange("stats_regions", e.target.value)}
@@ -136,6 +154,7 @@ export default function AdminHomepage() {
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Ministries Involved</label>
               <input 
+                title="Ministries Involved"
                 type="text"
                 value={content.stats_ministries}
                 onChange={(e) => handleChange("stats_ministries", e.target.value)}
