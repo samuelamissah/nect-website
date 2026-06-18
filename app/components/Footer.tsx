@@ -35,6 +35,7 @@ export default function Footer() {
               <li><Link href="/about" className="transition-colors hover:text-slate-900">About NECT</Link></li>
               <li><Link href="/agencies" className="transition-colors hover:text-slate-900">Partner Agencies</Link></li>
               <li><Link href="/gallery" className="transition-colors hover:text-slate-900">Gallery</Link></li>
+              <li><Link href="/videos" className="transition-colors hover:text-slate-900">Video Resources</Link></li>
               <li><Link href="/report" className="transition-colors hover:text-slate-900">Report Issue</Link></li>
               <li><Link href="/track" className="transition-colors hover:text-slate-900">Track Status</Link></li>
             </ul>
@@ -43,10 +44,10 @@ export default function Footer() {
           <div>
             <h3 className="text-sm font-bold uppercase tracking-wider text-slate-900">Resources</h3>
             <ul className="mt-6 space-y-4 text-sm text-slate-500">
-              <li><a href="#" className="inline-flex items-center gap-1 transition-colors hover:text-slate-900">Guidelines <ArrowUpRight className="h-3 w-3" /></a></li>
-              <li><a href="#" className="inline-flex items-center gap-1 transition-colors hover:text-slate-900">Contractor Portal <ArrowUpRight className="h-3 w-3" /></a></li>
+              <li><Link href="/guidelines" className="inline-flex items-center gap-1 transition-colors hover:text-slate-900">Guidelines <ArrowUpRight className="h-3 w-3" /></Link></li>
+              <li><Link href="/contractors" className="inline-flex items-center gap-1 transition-colors hover:text-slate-900">Contractor Portal <ArrowUpRight className="h-3 w-3" /></Link></li>
               <li><Link href="/news" className="transition-colors hover:text-slate-900">News & Updates</Link></li>
-              <li><a href="#" className="transition-colors hover:text-slate-900">FAQ</a></li>
+              <li><Link href="/faq" className="transition-colors hover:text-slate-900">FAQ</Link></li>
             </ul>
           </div>
 

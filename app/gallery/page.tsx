@@ -71,8 +71,11 @@ export default function GalleryPage() {
                 <div className="break-inside-avoid rounded-2xl border border-slate-200 bg-white shadow-md overflow-hidden group hover:shadow-xl hover:border-brand-primary/40 transition-all duration-300">
                   <div className="relative w-full overflow-hidden bg-slate-100">
                     {item.media_type === 'video' ? (
-                      <div className="relative">
-                        <video src={item.media_url} className="w-full h-auto object-cover max-h-[500px]" controls />
+                      <div className="relative cursor-pointer group" onClick={() => setSelectedMedia(item)}>
+                        <video src={item.media_url} className="w-full h-auto object-cover max-h-[500px]" />
+                        <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-300 flex items-center justify-center">
+                          <PlayCircle className="h-16 w-16 text-white/90 drop-shadow-lg group-hover:scale-110 transition-transform" />
+                        </div>
                         <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md text-white p-2 rounded-full shadow-lg z-10 pointer-events-none">
                           <Video className="h-4 w-4" />
                         </div>
@@ -118,8 +121,10 @@ export default function GalleryPage() {
             <XCircle className="h-10 w-10" />
           </button>
           <div className="relative max-w-5xl w-full max-h-full flex flex-col items-center" onClick={(e) => e.stopPropagation()}>
-            {selectedMedia.media_type === 'image' && (
+            {selectedMedia.media_type === 'image' ? (
               <img src={selectedMedia.media_url} alt={selectedMedia.title} className="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl" />
+            ) : (
+              <video src={selectedMedia.media_url} controls autoPlay className="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl bg-black w-full" />
             )}
             <div className="mt-6 text-center text-white max-w-2xl">
               <h2 className="text-2xl font-bold mb-2">{selectedMedia.title}</h2>
