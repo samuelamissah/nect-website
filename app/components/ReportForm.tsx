@@ -53,6 +53,7 @@ export default function ReportForm() {
       location: form.get("location"),
       description: form.get("description"),
       photo_url: photoUrl,
+      status: 'Submitted'
     });
 
     if (error) {
