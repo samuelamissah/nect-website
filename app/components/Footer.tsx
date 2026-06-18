@@ -34,6 +34,7 @@ export default function Footer() {
             <ul className="mt-6 space-y-4 text-sm text-slate-500">
               <li><Link href="/about" className="transition-colors hover:text-slate-900">About NECT</Link></li>
               <li><Link href="/agencies" className="transition-colors hover:text-slate-900">Partner Agencies</Link></li>
+              <li><Link href="/gallery" className="transition-colors hover:text-slate-900">Gallery</Link></li>
               <li><Link href="/report" className="transition-colors hover:text-slate-900">Report Issue</Link></li>
               <li><Link href="/track" className="transition-colors hover:text-slate-900">Track Status</Link></li>
             </ul>

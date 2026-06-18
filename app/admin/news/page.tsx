@@ -49,6 +49,13 @@ export default function AdminNews() {
     }
   }
 
+  async function deleteArticle(id: string) {
+    if (confirm("Are you sure you want to delete this article?")) {
+      await supabase.from("news").delete().eq("id", id);
+      window.location.reload();
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -91,10 +98,14 @@ export default function AdminNews() {
                 <p className="text-sm text-slate-600 line-clamp-2 mb-4 flex-1">{article.excerpt}</p>
                 
                 <div className="flex items-center justify-end gap-2 pt-4 border-t border-slate-100">
-                  <button className="p-2 text-slate-400 hover:text-brand-primary rounded-md hover:bg-brand-primary/10 transition-colors">
+                  <button title="Edit" onClick={() => setIsModalOpen(true)} className="p-2 text-slate-400 hover:text-brand-primary rounded-md hover:bg-brand-primary/10 transition-colors">
                     <Edit className="h-4 w-4" />
                   </button>
-                  <button className="p-2 text-slate-400 hover:text-red-600 rounded-md hover:bg-red-50 transition-colors">
+                  <button 
+                    title="Delete" 
+                    onClick={() => deleteArticle(article.id)} 
+                    className="p-2 text-slate-400 hover:text-red-600 rounded-md hover:bg-red-50 transition-colors"
+                  >
                     <Trash2 className="h-4 w-4" />
                   </button>
                 </div>
@@ -147,7 +158,21 @@ export default function AdminNews() {
 
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">Full Content</label>
-                  <textarea name="content" required rows={8} className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-brand-primary outline-none resize-none"></textarea>
+                  <div className="border border-slate-300 rounded-lg overflow-hidden">
+                    <div className="bg-slate-50 border-b border-slate-300 p-2 flex items-center gap-1 flex-wrap">
+                      {/* Rich Text Toolbar Mock */}
+                      <button type="button" className="p-1.5 hover:bg-slate-200 rounded text-slate-600 font-bold">B</button>
+                      <button type="button" className="p-1.5 hover:bg-slate-200 rounded text-slate-600 italic font-serif">I</button>
+                      <button type="button" className="p-1.5 hover:bg-slate-200 rounded text-slate-600 underline decoration-solid">U</button>
+                      <div className="w-px h-5 bg-slate-300 mx-1"></div>
+                      <button type="button" className="p-1.5 hover:bg-slate-200 rounded text-slate-600 font-bold text-xs">H1</button>
+                      <button type="button" className="p-1.5 hover:bg-slate-200 rounded text-slate-600 font-bold text-xs">H2</button>
+                      <div className="w-px h-5 bg-slate-300 mx-1"></div>
+                      <button type="button" className="p-1.5 hover:bg-slate-200 rounded text-slate-600 text-xs">List</button>
+                      <button type="button" className="p-1.5 hover:bg-slate-200 rounded text-slate-600 text-xs">Link</button>
+                    </div>
+                    <textarea name="content" required rows={12} placeholder="Write the article content here..." className="w-full px-4 py-3 outline-none resize-y"></textarea>
+                  </div>
                 </div>
 
                 <div>

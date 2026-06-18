@@ -15,6 +15,7 @@ export default function Header() {
           <Link href="/about" className="transition-colors hover:text-slate-900">About NECT</Link>
           <Link href="/agencies" className="transition-colors hover:text-slate-900">Agencies</Link>
           <Link href="/news" className="transition-colors hover:text-slate-900">News & Press</Link>
+          <Link href="/gallery" className="transition-colors hover:text-slate-900">Gallery</Link>
           <Link href="/#portal" className="transition-colors hover:text-slate-900">Citizen Portal</Link>
           <Link href="/track" className="transition-colors hover:text-slate-900">Track Report</Link>
         </nav>
