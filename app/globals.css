@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+@theme {
+  --color-nect-black: #0a0a0a;
+  --color-nect-gold: #d8ca1f;
+  --color-nect-green: #1d8f45;
+  --color-nect-red: #d62828;
+  --color-nect-cream: #f6f2e8;
+  --color-brand-primary: #1e3a8a; /* Deep Blue for Trust */
+  --color-brand-secondary: #0ea5e9; /* Light Blue for Tech/Modernity */
+  --color-brand-accent: #f59e0b; /* Amber/Gold for Alerts/Actions */
+}
+
+@layer base {
+  * {
+    @apply border-slate-200;
+  }
+  body {
+    @apply bg-slate-50 text-slate-900;
+  }
+}
+
+@layer components {
+  .input {
+    @apply w-full rounded-2xl border border-slate-300 bg-white px-5 py-4 text-base outline-none transition-all duration-200;
+  }
+
+  .input:focus {
+    @apply border-brand-secondary ring-4 ring-brand-secondary/20;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-full bg-slate-900 px-8 py-4 text-sm font-bold text-white transition-all hover:bg-slate-800 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0;
+  }
+
+  .btn-accent {
+    @apply inline-flex items-center justify-center rounded-full bg-brand-accent px-8 py-4 text-sm font-bold text-slate-900 transition-all hover:bg-amber-400 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0;
+  }
+
+  .btn-outline {
+    @apply inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-8 py-4 text-sm font-bold text-slate-900 transition-all hover:border-slate-300 hover:bg-slate-50 hover:shadow-sm hover:-translate-y-0.5 active:translate-y-0;
+  }
+}
