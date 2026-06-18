@@ -133,7 +133,7 @@ export default function AdminNews() {
             <div key={article.id} className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm flex flex-col">
               <div className="h-40 bg-slate-100 relative group flex items-center justify-center">
                 {article.image_url ? (
-                  <Image src={article.image_url} alt="" fill className="object-cover" />
+                  <Image src={article.image_url} alt="" fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" className="object-cover" />
                 ) : (
                   <ImageIcon className="h-8 w-8 text-slate-300" />
                 )}

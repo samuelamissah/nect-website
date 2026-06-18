@@ -29,6 +29,7 @@ export default function AdminDashboard() {
     setLoading(true);
     
     try {
+      const { count: reportsCount } = await supabase
         .from('reports')
         .select('*', { count: 'exact', head: true });
       setTotalReports(reportsCount || 0);

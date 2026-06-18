@@ -108,7 +108,7 @@ export default function AdminLayout({
           <div>
             <Link href="/" className="flex items-center gap-3">
                <div className="h-10 w-full relative">
-                 <Image src="/NECT.jpeg" alt="NECT Logo" fill className="object-contain object-left mix-blend-multiply" />
+                 <Image src="/NECT.jpeg" alt="NECT Logo" fill sizes="160px" className="object-contain object-left mix-blend-multiply" />
                </div>
             </Link>
             <p className="mt-2 text-xs font-bold uppercase tracking-wider text-slate-500">Admin Portal</p>
