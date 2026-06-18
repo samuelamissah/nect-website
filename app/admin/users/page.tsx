@@ -169,7 +169,7 @@ export default function AdminUsers() {
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md">
             <div className="border-b border-slate-200 px-6 py-4 flex items-center justify-between">
               <h2 className="text-xl font-bold text-slate-900">Add New User</h2>
-              <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600 transition-colors">
+              <button title="Close Modal"  onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600 transition-colors">
                 <XCircle className="h-6 w-6" />
               </button>
             </div>
@@ -187,7 +187,7 @@ export default function AdminUsers() {
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Role & Permissions</label>
-                <select name="role" required className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-brand-primary outline-none bg-white">
+                <select title="jd" name="role" required className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-brand-primary outline-none bg-white">
                   <option value="Report Officer">Report Officer</option>
                   <option value="Content Editor">Content Editor</option>
                   <option value="Administrator">Administrator</option>

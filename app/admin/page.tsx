@@ -22,16 +22,13 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     setMounted(true);
-
     fetchDashboardData();
   }, []);
 
-  async function fetchDashboardData() {
+  const fetchDashboardData = async () => {
     setLoading(true);
     
     try {
-      // Fetch total reports
-      const { count: reportsCount } = await supabase
         .from('reports')
         .select('*', { count: 'exact', head: true });
       setTotalReports(reportsCount || 0);
@@ -102,6 +99,8 @@ export default function AdminDashboard() {
     
     setLoading(false);
   }
+
+  if (!mounted) return null;
 
   if (loading) {
     return <div className="h-full flex flex-col items-center justify-center py-20 text-slate-500"><Loader2 className="h-8 w-8 animate-spin mb-4 text-brand-primary" /> Loading dashboard...</div>;

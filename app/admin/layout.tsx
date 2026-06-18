@@ -113,7 +113,7 @@ export default function AdminLayout({
             </Link>
             <p className="mt-2 text-xs font-bold uppercase tracking-wider text-slate-500">Admin Portal</p>
           </div>
-          <button className="md:hidden text-slate-500 hover:text-slate-700" onClick={() => setIsMobileSidebarOpen(false)}>
+          <button  title="Close Sidebar" className="md:hidden text-slate-500 hover:text-slate-700" onClick={() => setIsMobileSidebarOpen(false)}>
             <X className="h-6 w-6" />
           </button>
         </div>
@@ -177,6 +177,7 @@ export default function AdminLayout({
         <header className="h-16 flex-shrink-0 border-b border-slate-200 bg-white flex items-center justify-between px-4 sm:px-8">
           <div className="flex items-center gap-3">
             <button 
+            title="Open Sidebar"
               className="md:hidden text-slate-600 p-1"
               onClick={() => setIsMobileSidebarOpen(true)}
             >
