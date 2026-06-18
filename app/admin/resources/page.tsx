@@ -171,7 +171,7 @@ export default function AdminResources() {
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg">
             <div className="border-b border-slate-200 px-6 py-4 flex items-center justify-between">
               <h2 className="text-xl font-bold text-slate-900">Upload Document</h2>
-              <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600 transition-colors">
+              <button title="Close" onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600 transition-colors">
                 <XCircle className="h-6 w-6" />
               </button>
             </div>
@@ -179,12 +179,12 @@ export default function AdminResources() {
             <form onSubmit={handleSubmit} className="p-6 space-y-5">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Document Title</label>
-                <input name="title" required className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-brand-primary outline-none" />
+                <input title="js" type="text" name="title" required className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-brand-primary outline-none" />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Category</label>
-                <select name="category" required className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-brand-primary outline-none bg-white">
+                <select title="js"  name="category" required className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-brand-primary outline-none bg-white">
                   <option value="Policies">Policies</option>
                   <option value="Guidelines">Guidelines</option>
                   <option value="Reports">Reports</option>
@@ -196,19 +196,19 @@ export default function AdminResources() {
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
-                <textarea name="description" required rows={2} className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-brand-primary outline-none resize-none"></textarea>
+                <textarea title="sb" name="description" required rows={2} className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-brand-primary outline-none resize-none"></textarea>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">File Upload (PDF, DOCX, XLSX, PPTX)</label>
-                <input type="file" name="resource_file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx" required className="w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-brand-primary/10 file:text-brand-primary hover:file:bg-brand-primary/20 transition-colors cursor-pointer border border-slate-200 rounded-lg p-1" />
+                <input title="Upload File" type="file" name="resource_file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx" required className="w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-brand-primary/10 file:text-brand-primary hover:file:bg-brand-primary/20 transition-colors cursor-pointer border border-slate-200 rounded-lg p-1" />
               </div>
 
               <div className="pt-4 border-t border-slate-200 flex justify-end gap-3">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="px-6 py-2 rounded-lg border border-slate-300 text-slate-700 font-medium hover:bg-slate-50">
+                <button title="Cancel" type="button" onClick={() => setIsModalOpen(false)} className="px-6 py-2 rounded-lg border border-slate-300 text-slate-700 font-medium hover:bg-slate-50">
                   Cancel
                 </button>
-                <button type="submit" disabled={uploading} className="flex items-center gap-2 px-6 py-2 rounded-lg bg-brand-primary text-white font-bold hover:bg-brand-primary/90 disabled:opacity-70">
+                <button title="Upload Document" type="submit" disabled={uploading} className="flex items-center gap-2 px-6 py-2 rounded-lg bg-brand-primary text-white font-bold hover:bg-brand-primary/90 disabled:opacity-70">  
                   {uploading && <Loader2 className="h-4 w-4 animate-spin" />}
                   {uploading ? "Uploading..." : "Upload Document"}
                 </button>

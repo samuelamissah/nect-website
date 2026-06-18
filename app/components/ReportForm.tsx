@@ -20,20 +20,20 @@ export default function ReportForm() {
     let photoUrl = "";
 
     if (file && file.size > 0) {
-      const uploadName = `${Date.now()}-${file.name}`;
+      const uploadName = `reports/${Date.now()}-${file.name}`;
 
       const { error: uploadError } = await supabase.storage
-        .from("report-photos")
+        .from("nect-media")
         .upload(uploadName, file);
 
       if (uploadError) {
-        alert(uploadError.message);
+        alert("Image Upload Error: " + uploadError.message);
         setLoading(false);
         return;
       }
 
       const { data } = supabase.storage
-        .from("report-photos")
+        .from("nect-media")
         .getPublicUrl(uploadName);
 
       photoUrl = data.publicUrl;
@@ -59,9 +59,24 @@ export default function ReportForm() {
     if (error) {
       alert(error.message);
     } else {
-      // In a real production environment, you would trigger an Edge Function or API Route here
-      // to send an email to the NECT team or the user.
-      // Example stub: await fetch('/api/notify', { method: 'POST', body: JSON.stringify({ reference: ref }) })
+      // Trigger email notification if user provided an email
+      if (!anonymous && form.get("email")) {
+        try {
+          await fetch('/api/notify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'submission',
+              email: form.get("email"),
+              name: form.get("full_name"),
+              reference: ref,
+              report_type: form.get("report_type")
+            })
+          });
+        } catch (err) {
+          console.error("Failed to send email notification", err);
+        }
+      }
       
       setReference(ref);
       setFileName(null);

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { supabase } from "@/app/lib/supabase";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
-import { Search, Loader2, FileText, MapPin, Info } from "lucide-react";
+import { Search, Loader2, FileText, MapPin, Info, CheckCircle } from "lucide-react";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -116,6 +116,18 @@ export default function TrackPage() {
                   </div>
                 </div>
               </div>
+
+              {report.internal_notes && (
+                <div className="mt-8 border-t border-slate-100 pt-8">
+                  <p className="text-sm font-bold uppercase tracking-wider text-brand-primary mb-2 flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4" />
+                    Official Update / Action Taken
+                  </p>
+                  <p className="text-slate-700 leading-relaxed bg-brand-primary/5 p-5 rounded-xl border border-brand-primary/20 whitespace-pre-wrap">
+                    {report.internal_notes}
+                  </p>
+                </div>
+              )}
             </div>
           )}
         </div>

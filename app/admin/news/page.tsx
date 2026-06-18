@@ -28,7 +28,10 @@ export default function AdminNews() {
   }
 
   useEffect(() => {
-    fetchArticles();
+    // Wrap fetch call in async IIFE to prevent setState from being called synchronously in effect
+    (async () => {
+      await fetchArticles();
+    })();
   }, []);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -179,7 +182,7 @@ export default function AdminNews() {
               <h2 className="text-xl font-bold text-slate-900">
                 {editingArticle ? "Edit Article" : "Publish New Article"}
               </h2>
-              <button onClick={() => { setIsModalOpen(false); setEditingArticle(null); }} className="text-slate-400 hover:text-slate-600">
+              <button title="Close" onClick={() => { setIsModalOpen(false); setEditingArticle(null); }} className="text-slate-400 hover:text-slate-600">
                 <XCircle className="h-6 w-6" />
               </button>
             </div>
@@ -188,13 +191,13 @@ export default function AdminNews() {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">Article Title</label>
-                  <input name="title" required defaultValue={editingArticle?.title || ""} className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-brand-primary focus:ring-1 focus:ring-brand-primary outline-none" />
+                  <input title="js" name="title" required defaultValue={editingArticle?.title || ""} className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-brand-primary focus:ring-1 focus:ring-brand-primary outline-none" />
                 </div>
                 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1">Category</label>
-                    <select name="category" required defaultValue={editingArticle?.category || "Operations"} className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-brand-primary outline-none bg-white">
+                    <select title="js" name="category" required defaultValue={editingArticle?.category || "Operations"} className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-brand-primary outline-none bg-white">
                       <option value="Operations">Operations</option>
                       <option value="Policy">Policy</option>
                       <option value="Enforcement">Enforcement</option>
@@ -211,7 +214,7 @@ export default function AdminNews() {
 
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">Short Excerpt</label>
-                  <textarea name="excerpt" required rows={2} defaultValue={editingArticle?.excerpt || ""} className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-brand-primary outline-none resize-none"></textarea>
+                  <textarea title="js" name="excerpt" required rows={2} defaultValue={editingArticle?.excerpt || ""} className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-brand-primary outline-none resize-none"></textarea>
                 </div>
 
                 <div>

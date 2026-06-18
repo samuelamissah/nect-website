@@ -14,13 +14,15 @@ export default function AdminDashboard() {
   const [pendingReports, setPendingReports] = useState(0);
   const [totalArticles, setTotalArticles] = useState(0);
   const [totalResources, setTotalResources] = useState(0);
-  
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+
   // Chart state
   const [reportData, setReportData] = useState<any[]>([]);
   const [categoryData, setCategoryData] = useState<any[]>([]);
 
   useEffect(() => {
     setMounted(true);
+
     fetchDashboardData();
   }, []);
 

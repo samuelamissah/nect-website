@@ -32,7 +32,7 @@ export default function AdminVideos() {
     const form = new FormData(e.currentTarget);
     
     // Auto-generate thumbnail for YouTube if possible, or leave blank for manual
-    let videoUrl = form.get("video_url") as string;
+    const videoUrl = form.get("video_url") as string;
     let thumbnailUrl = form.get("thumbnail_url") as string;
     
     // Very basic youtube thumbnail extractor
@@ -88,7 +88,7 @@ export default function AdminVideos() {
            </div>
         ) : videos.length === 0 ? (
            <div className="col-span-full py-12 text-center border-2 border-dashed border-slate-200 rounded-xl text-slate-500 bg-white">
-             No videos published yet. Click "Embed Video" to start.
+             No videos published yet. Click &quot;Embed Video&quot; to start.
            </div>
         ) : (
           videos.map((video) => (
@@ -133,7 +133,7 @@ export default function AdminVideos() {
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl">
             <div className="border-b border-slate-200 px-6 py-4 flex items-center justify-between">
               <h2 className="text-xl font-bold text-slate-900">Embed External Video</h2>
-              <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600 transition-colors">
+              <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600 transition-colors" title="Close Modal">
                 <XCircle className="h-6 w-6" />
               </button>
             </div>
@@ -141,13 +141,13 @@ export default function AdminVideos() {
             <form onSubmit={handleSubmit} className="p-6 space-y-5">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Video Title</label>
-                <input name="title" required className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-brand-primary outline-none" />
-              </div>
+                <input title="js" required className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-brand-primary outline-none" />
+              </div> 
               
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">Category</label>
-                  <select name="category" required className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-brand-primary outline-none bg-white">
+                  <select id="category" title="s" name="category" required className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-brand-primary outline-none bg-white">
                     <option value="Operations">Operations</option>
                     <option value="Training">Training</option>
                     <option value="Press Briefing">Press Briefing</option>
@@ -168,7 +168,7 @@ export default function AdminVideos() {
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
-                <textarea name="description" required rows={3} className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-brand-primary outline-none resize-none"></textarea>
+                <textarea title="sb" name="description" required rows={3} className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-brand-primary outline-none resize-none"></textarea>
               </div>
 
               <div className="pt-4 border-t border-slate-200 flex justify-end gap-3">

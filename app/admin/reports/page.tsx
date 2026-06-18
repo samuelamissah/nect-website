@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/app/lib/supabase";
 import { Search, Filter, Eye, CheckCircle, XCircle, MapPin, Calendar, User, Clock, FileText, AlertTriangle } from "lucide-react";
+import toast from "react-hot-toast";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -27,15 +28,51 @@ export default function AdminReports() {
   }, []);
 
   async function updateStatus(id: string, status: string) {
-    await supabase.from("reports").update({ status }).eq("id", id);
-    window.location.reload(); 
+    const { error } = await supabase.from("reports").update({ status }).eq("id", id);
+    if (!error) {
+      toast.success("Status updated to " + status);
+      
+      // Update local state instead of reloading
+      setReports(reports.map(r => r.id === id ? { ...r, status } : r));
+      if (selectedReport) {
+        const updatedReport = { ...selectedReport, status };
+        setSelectedReport(updatedReport);
+        
+        // Trigger email if not anonymous
+        if (!updatedReport.anonymous && updatedReport.email) {
+          try {
+            await fetch('/api/notify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                type: 'status_update',
+                email: updatedReport.email,
+                name: updatedReport.full_name,
+                reference: updatedReport.reference,
+                status: status
+              })
+            });
+            toast.success(`User notified via email`);
+          } catch (err) {
+            console.error("Failed to notify user", err);
+          }
+        }
+      }
+    } else {
+      toast.error("Failed to update status");
+    }
   }
 
   async function saveNotes() {
     if (!selectedReport) return;
-    await supabase.from("reports").update({ internal_notes: notes }).eq("id", selectedReport.id);
-    alert("Notes saved successfully.");
-    window.location.reload();
+    const { error } = await supabase.from("reports").update({ internal_notes: notes }).eq("id", selectedReport.id);
+    if (!error) {
+      toast.success("Internal notes saved successfully");
+      setReports(reports.map(r => r.id === selectedReport.id ? { ...r, internal_notes: notes } : r));
+      setSelectedReport({ ...selectedReport, internal_notes: notes });
+    } else {
+      toast.error("Failed to save notes");
+    }
   }
 
   return (
@@ -121,7 +158,7 @@ export default function AdminReports() {
                   {selectedReport.status || 'Submitted'}
                 </span>
               </div>
-              <button onClick={() => setSelectedReport(null)} className="text-slate-400 hover:text-slate-600 transition-colors">
+              <button title="Close Details" onClick={() => setSelectedReport(null)} className="text-slate-400 hover:text-slate-600 transition-colors">
                 <XCircle className="h-6 w-6" />
               </button>
             </div>
@@ -188,6 +225,7 @@ export default function AdminReports() {
                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Quick Actions</h3>
                    <div className="space-y-2">
                      <select 
+                     title="d"
                        className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:border-brand-primary outline-none font-medium"
                        value={selectedReport.status || 'Submitted'}
                        onChange={(e) => updateStatus(selectedReport.id, e.target.value)}
@@ -212,21 +250,10 @@ export default function AdminReports() {
                      placeholder="Add investigation notes here..."
                      value={notes}
                      onChange={(e) => setNotes(e.target.value)}
-                   />
-                   <button onClick={saveNotes} className="w-full py-2 bg-brand-primary text-white hover:bg-brand-primary/90 text-sm font-bold rounded-lg transition-colors">
+                   ></textarea>
+                   <button onClick={saveNotes} className="w-full py-2 bg-brand-primary text-white text-sm font-bold rounded-lg hover:bg-brand-primary/90 transition-colors shadow-sm">
                      Save Notes
                    </button>
-                 </div>
-
-                 <div>
-                   <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Audit Trail</h3>
-                   <div className="relative pl-4 border-l-2 border-slate-200 space-y-4">
-                      <div className="relative">
-                        <div className="absolute -left-[21px] top-1 h-2.5 w-2.5 rounded-full bg-slate-300 border-2 border-white"></div>
-                        <p className="text-xs font-bold text-slate-900">Report Submitted</p>
-                        <p className="text-[10px] text-slate-500 flex items-center gap-1 mt-0.5"><Calendar className="h-3 w-3" /> {new Date(selectedReport.created_at).toLocaleString()}</p>
-                      </div>
-                   </div>
                  </div>
                </div>
             </div>
