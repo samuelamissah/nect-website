@@ -67,7 +67,7 @@ export default function FAQPage() {
             Frequently Asked Questions
           </h1>
           <p className="mt-6 text-lg leading-relaxed text-slate-600 max-w-2xl mx-auto">
-            Find answers to common questions about NECT's operations, reporting procedures, and contractor compliance.
+            Find answers to common questions about NECT&apos;s operations, reporting procedures, and contractor compliance.
           </p>
         </div>
       </section>
@@ -117,7 +117,7 @@ export default function FAQPage() {
             <MessageCircle className="h-10 w-10 text-brand-accent mx-auto mb-4" />
             <h3 className="text-2xl font-bold text-white mb-3">Still have questions?</h3>
             <p className="text-slate-300 mb-8 max-w-lg mx-auto">
-              If you couldn't find the answer you were looking for, please reach out to our support team directly.
+              If you couldn&apos;t find the answer you were looking for, please reach out to our support team directly.
             </p>
             <a href="mailto:info@nect.gov.gh" className="inline-flex items-center gap-2 px-8 py-3 bg-brand-accent text-slate-900 font-bold rounded-lg hover:bg-brand-accent/90 transition-colors">
               Contact Support

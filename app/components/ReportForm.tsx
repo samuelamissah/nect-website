@@ -64,8 +64,12 @@ export default function ReportForm() {
       // Example stub: await fetch('/api/notify', { method: 'POST', body: JSON.stringify({ reference: ref }) })
       
       setReference(ref);
-      event.currentTarget.reset();
       setFileName(null);
+      try {
+        (event.target as HTMLFormElement).reset();
+      } catch (e) {
+        console.error("Form reset error:", e);
+      }
     }
 
     setLoading(false);

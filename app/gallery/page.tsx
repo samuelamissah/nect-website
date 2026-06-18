@@ -44,7 +44,7 @@ export default function GalleryPage() {
                 Operational Gallery
               </h1>
               <p className="mt-6 text-lg leading-relaxed text-slate-300">
-                Explore visual documentation of NECT's field operations, site inspections, and infrastructure interventions across the nation.
+                Explore visual documentation of NECT&apos;s field operations, site inspections, and infrastructure interventions across the nation.
               </p>
             </div>
           </div>
@@ -117,7 +117,7 @@ export default function GalleryPage() {
       {/* Lightbox Modal */}
       {selectedMedia && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4 md:p-10" onClick={() => setSelectedMedia(null)}>
-          <button className="absolute top-6 right-6 text-white/70 hover:text-white transition-colors" onClick={() => setSelectedMedia(null)}>
+          <button title="Close Modal" className="absolute top-6 right-6 text-white/70 hover:text-white transition-colors" onClick={() => setSelectedMedia(null)}>
             <XCircle className="h-10 w-10" />
           </button>
           <div className="relative max-w-5xl w-full max-h-full flex flex-col items-center" onClick={(e) => e.stopPropagation()}>
