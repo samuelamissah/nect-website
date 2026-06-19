@@ -81,40 +81,73 @@ export default function AboutPage() {
 
           {/* Sidebar */}
           <div className="space-y-8">
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                <Users className="h-5 w-5 text-slate-400" />
-                Leadership
-              </h3>
-              <div className="space-y-4">
-                <div>
-                  <p className="font-bold text-slate-900">Ing. Dr. Kwame Mensah</p>
-                  <p className="text-sm text-slate-500">National Coordinator</p>
-                </div>
-                <div className="h-px w-full bg-slate-100"></div>
-                <div>
-                  <p className="font-bold text-slate-900">Surv. Akosua Osei</p>
-                  <p className="text-sm text-slate-500">Head of Technical Operations</p>
-                </div>
-                <div className="h-px w-full bg-slate-100"></div>
-                <div>
-                  <p className="font-bold text-slate-900">Ing. Samuel Addo</p>
-                  <p className="text-sm text-slate-500">Director of Utility Relations</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-2xl bg-brand-primary p-6 text-white shadow-lg">
+            <div className="rounded-2xl bg-slate-900 p-6 text-white shadow-lg">
               <h3 className="text-lg font-bold mb-2">Join the Network</h3>
               <p className="text-sm text-white/80 mb-6">
                 Are you a licensed contractor or utility provider? Register on our portal to submit your project schedules.
               </p>
-              <button className="w-full rounded-sm bg-white px-4 py-3 text-sm font-bold text-brand-primary transition-colors hover:bg-slate-100">
+              <button className="w-full rounded-sm bg-brand-primary px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-brand-primary/90">
                 Contractor Registration
               </button>
             </div>
           </div>
 
+        </div>
+      </section>
+
+      {/* Leadership Section */}
+      <section className="bg-white py-20 lg:py-24 border-t border-slate-200">
+        <div className="mx-auto max-w-7xl px-5 lg:px-10">
+          <div className="mb-16 text-center">
+            <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 md:text-4xl">
+              Our Leadership
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-600">
+              Guided by experienced engineering professionals and public administrators committed to national development.
+            </p>
+          </div>
+
+          <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
+            {/* Chairman */}
+            <div className="flex flex-col items-center text-center group">
+              <div className="mb-6 h-40 w-40 overflow-hidden rounded-full border-4 border-slate-50 bg-slate-200 shadow-xl transition-transform duration-300 group-hover:scale-105 group-hover:border-brand-primary/20">
+                <div className="h-full w-full bg-[url('https://i.pravatar.cc/300?img=11')] bg-cover bg-center"></div>
+              </div>
+              <h3 className="text-xl font-bold text-slate-900">Ing. Dr. Kwame Mensah</h3>
+              <p className="mt-1 font-semibold text-brand-primary">Chairman</p>
+              <p className="mt-3 text-sm text-slate-500">Former Minister of Roads and Highways with over 30 years of civil engineering experience.</p>
+            </div>
+
+            {/* Secretariat */}
+            <div className="flex flex-col items-center text-center group">
+              <div className="mb-6 h-40 w-40 overflow-hidden rounded-full border-4 border-slate-50 bg-slate-200 shadow-xl transition-transform duration-300 group-hover:scale-105 group-hover:border-brand-primary/20">
+                <div className="h-full w-full bg-[url('https://i.pravatar.cc/300?img=5')] bg-cover bg-center"></div>
+              </div>
+              <h3 className="text-xl font-bold text-slate-900">Surv. Akosua Osei</h3>
+              <p className="mt-1 font-semibold text-brand-primary">Head of Secretariat</p>
+              <p className="mt-3 text-sm text-slate-500">Expert in public administration and infrastructure policy implementation.</p>
+            </div>
+
+            {/* Executive Team */}
+            <div className="flex flex-col items-center text-center group">
+              <div className="mb-6 h-40 w-40 overflow-hidden rounded-full border-4 border-slate-50 bg-slate-200 shadow-xl transition-transform duration-300 group-hover:scale-105 group-hover:border-brand-primary/20">
+                <div className="h-full w-full bg-[url('https://i.pravatar.cc/300?img=8')] bg-cover bg-center"></div>
+              </div>
+              <h3 className="text-xl font-bold text-slate-900">Ing. Samuel Addo</h3>
+              <p className="mt-1 font-semibold text-brand-primary">Executive Director, Technical</p>
+              <p className="mt-3 text-sm text-slate-500">Specializes in utility coordination and structural integrity assessment.</p>
+            </div>
+
+            {/* Key Coordinators */}
+            <div className="flex flex-col items-center text-center group">
+              <div className="mb-6 h-40 w-40 overflow-hidden rounded-full border-4 border-slate-50 bg-slate-200 shadow-xl transition-transform duration-300 group-hover:scale-105 group-hover:border-brand-primary/20">
+                <div className="h-full w-full bg-[url('https://i.pravatar.cc/300?img=47')] bg-cover bg-center"></div>
+              </div>
+              <h3 className="text-xl font-bold text-slate-900">Dr. Grace Anim</h3>
+              <p className="mt-1 font-semibold text-brand-primary">Chief Coordinator</p>
+              <p className="mt-3 text-sm text-slate-500">Leads inter-agency collaboration between MMDAs and utility providers.</p>
+            </div>
+          </div>
         </div>
       </section>
 

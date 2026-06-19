@@ -3,6 +3,7 @@ import Footer from "@/app/components/Footer";
 import HeroScene from "@/app/components/HeroScene";
 import AnimatedSection from "@/app/components/AnimatedSection";
 import Link from "next/link";
+import { supabase } from "@/app/lib/supabase";
 import {
   Cable,
   Construction,
@@ -12,255 +13,259 @@ import {
   ArrowRight,
   BarChart3,
   Search,
+  AlertTriangle,
+  FileText,
+  Mail,
+  Network,
+  Activity,
+  CheckCircle2,
+  BellRing,
+  Newspaper
 } from "lucide-react";
+import Image from "next/image";
 
-const mandate = [
-  {
-    icon: ShieldCheck,
-    title: "Protect Road Reservations",
-    text: "Prevent encroachment and unauthorized development within road corridors to ensure safety and future expansion.",
-    color: "bg-blue-50 text-blue-600",
-  },
-  {
-    icon: Cable,
-    title: "Prevent Utility Damage",
-    text: "Reduce fibre cuts, burst water pipes, damaged power cables and service disruption across the nation.",
-    color: "bg-amber-50 text-amber-600",
-  },
-  {
-    icon: UsersRound,
-    title: "Coordinate Stakeholders",
-    text: "Bring ministries, road agencies, utility providers, contractors and assemblies together on one platform.",
-    color: "bg-purple-50 text-purple-600",
-  },
-  {
-    icon: Construction,
-    title: "Support Safe Construction",
-    text: "Ensure contractors engage utility agencies before excavation and road works begin to save costs.",
-    color: "bg-emerald-50 text-emerald-600",
-  },
-];
+export const revalidate = 60; // Revalidate every 60 seconds
 
-export default function Home() {
+export default async function Home() {
+  // Fetch latest news
+  const { data: newsArticles } = await supabase
+    .from("news")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(3);
+
   return (
     <main className="min-h-screen bg-slate-50 selection:bg-brand-secondary selection:text-white">
       <Header />
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden px-5 py-12 lg:px-10 lg:py-20">
-        <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-slate-100 via-slate-50 to-slate-50"></div>
-        <div className="absolute right-0 top-0 -mr-40 -mt-40 h-96 w-96 rounded-full bg-brand-secondary/5 blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 -ml-40 -mb-40 h-96 w-96 rounded-full bg-brand-accent/5 blur-3xl"></div>
+      <section className="relative overflow-hidden px-5 py-12 lg:px-10 lg:py-20 border-b border-slate-200">
+        <div className="absolute inset-0 z-0 bg-slate-50"></div>
+        <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'linear-gradient(#1e3a8a 1px, transparent 1px), linear-gradient(90deg, #1e3a8a 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
 
         <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-16 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="max-w-3xl">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm">
-              <span className="flex h-2 w-2 rounded-full bg-brand-accent"></span>
-              National Engineering Coordinating Team
+            <div className="mb-6 inline-flex items-center gap-2 rounded-sm border border-brand-primary/20 bg-brand-primary/5 px-4 py-2 text-sm font-bold text-brand-primary uppercase tracking-wider">
+              <span className="flex h-2 w-2 rounded-full bg-brand-primary"></span>
+              National Infrastructure Command
             </div>
 
-            <h1 className="text-5xl font-extrabold leading-[1.05] tracking-tight text-slate-900 sm:text-6xl lg:text-7xl">
-              Engineering coordination for Ghana’s <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-primary to-brand-secondary">critical infrastructure.</span>
+            <h1 className="text-5xl font-extrabold leading-[1.1] tracking-tight text-slate-900 sm:text-6xl lg:text-6xl">
+              Protecting Ghana&apos;s Infrastructure Through Engineering Coordination.
             </h1>
 
-            <p className="mt-8 text-lg leading-relaxed text-slate-600 sm:text-xl">
-              NECT coordinates road agencies, utilities, contractors, government
-              institutions and local authorities to protect road reservations,
-              prevent utility damage and reduce costly project conflicts.
+            <p className="mt-8 text-lg leading-relaxed text-slate-600 sm:text-xl font-medium">
+              NECT brings together road agencies, utility providers, contractors, local authorities, engineers and government institutions to protect road reservations, prevent utility damage and support sustainable national development.
             </p>
 
             <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
               <Link
                 href="/report"
-                className="btn-primary group"
+                className="inline-flex items-center justify-center rounded-sm bg-[#CE1126] px-8 py-4 text-sm font-bold text-white transition-all hover:bg-[#a80e1f] hover:shadow-lg hover:-translate-y-0.5 group"
               >
-                Report an Issue
+                Report Infrastructure Issue
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
 
               <Link
-                href="/track"
-                className="btn-outline group"
+                href="/about"
+                className="inline-flex items-center justify-center rounded-sm border-2 border-slate-900 bg-transparent px-8 py-4 text-sm font-bold text-slate-900 transition-all hover:bg-slate-900 hover:text-white hover:shadow-lg hover:-translate-y-0.5"
               >
-                Track Status
-                <Search className="ml-2 h-4 w-4 text-slate-400 transition-colors group-hover:text-slate-600" />
+                Learn About NECT
               </Link>
-            </div>
-            
-            <div className="mt-12 flex items-center gap-6 text-sm font-medium text-slate-500">
-              <div className="flex -space-x-2">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className={`h-8 w-8 rounded-full border-2 border-white bg-slate-${i * 200}`}></div>
-                ))}
-              </div>
-              <p>Trusted by 37+ national institutions</p>
             </div>
           </div>
 
-          <div className="relative aspect-square w-full rounded-sm bg-slate-900 p-2 shadow-2xl overflow-hidden border-2 border-slate-900">
+          <div className="relative aspect-square w-full rounded-sm bg-slate-900 p-2 shadow-2xl overflow-hidden border border-slate-800">
              <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'linear-gradient(#ffffff 1px, transparent 1px), linear-gradient(90deg, #ffffff 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
              <HeroScene />
+             
+             {/* Overlay UI elements to make it look like a command center */}
+             <div className="absolute top-4 left-4 right-4 flex justify-between pointer-events-none">
+                <div className="bg-slate-900/80 backdrop-blur border border-slate-700 text-xs font-mono text-emerald-400 px-3 py-1 rounded-sm flex items-center gap-2">
+                   <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                   SYSTEM ACTIVE
+                </div>
+                <div className="bg-slate-900/80 backdrop-blur border border-slate-700 text-xs font-mono text-slate-300 px-3 py-1 rounded-sm">
+                   COORD_NODE: ACCRA_01
+                </div>
+             </div>
+             <div className="absolute bottom-4 left-4 right-4 pointer-events-none flex gap-2">
+                <div className="h-1 flex-1 bg-brand-secondary/30 rounded-full overflow-hidden">
+                   <div className="h-full w-2/3 bg-brand-secondary"></div>
+                </div>
+                <div className="h-1 flex-1 bg-amber-500/30 rounded-full overflow-hidden">
+                   <div className="h-full w-1/3 bg-amber-500"></div>
+                </div>
+             </div>
           </div>
         </div>
       </section>
 
+      {/* Quick Actions Section */}
       <AnimatedSection direction="up">
-        <section className="border-y border-slate-200 bg-white">
-          <div className="mx-auto max-w-7xl px-5 py-12 lg:px-10">
-            <div className="grid grid-cols-2 gap-8 md:grid-cols-4 divide-x divide-slate-100">
-              {[
-                ["37+", "Member Institutions"],
-                ["16", "Regional Focus"],
-                ["9+", "Ministries Involved"],
-                ["24/7", "Public Reporting"],
-              ].map(([number, label], i) => (
-                <div key={label} className={`flex flex-col items-center justify-center text-center ${i !== 0 ? 'pl-8' : ''}`}>
-                  <p className="text-4xl font-black text-slate-900 lg:text-5xl">{number}</p>
-                  <p className="mt-2 text-sm font-medium uppercase tracking-wider text-slate-500">{label}</p>
-                </div>
-              ))}
+        <section className="bg-slate-100 border-b border-slate-200 py-16 px-5 lg:px-10">
+          <div className="mx-auto max-w-7xl">
+            <h2 className="text-2xl font-bold text-slate-900 mb-8 flex items-center gap-3">
+               <Activity className="h-6 w-6 text-brand-primary" />
+               What Would You Like To Do?
+            </h2>
+            
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+               {[
+                 { title: "Report Encroachment", icon: ShieldCheck, href: "/report?type=encroachment", color: "text-brand-primary", bg: "bg-brand-primary/10" },
+                 { title: "Report Utility Damage", icon: AlertTriangle, href: "/report?type=damage", color: "text-amber-600", bg: "bg-amber-100" },
+                 { title: "Track Existing Report", icon: Search, href: "/track", color: "text-emerald-600", bg: "bg-emerald-100" },
+                 { title: "Download Guidelines", icon: FileText, href: "/guidelines", color: "text-blue-600", bg: "bg-blue-100" },
+                 { title: "Latest Notices", icon: BellRing, href: "#alerts", color: "text-purple-600", bg: "bg-purple-100" },
+                 { title: "Contact NECT", icon: Mail, href: "#contact", color: "text-slate-600", bg: "bg-slate-200" },
+               ].map((action, i) => (
+                 <Link href={action.href} key={i} className="group bg-white border border-slate-200 rounded-sm p-5 hover:border-brand-primary hover:shadow-md transition-all flex flex-col items-center text-center gap-3">
+                    <div className={`h-12 w-12 rounded-full ${action.bg} flex items-center justify-center transition-transform group-hover:scale-110`}>
+                       <action.icon className={`h-6 w-6 ${action.color}`} />
+                    </div>
+                    <span className="text-sm font-bold text-slate-700 group-hover:text-brand-primary">{action.title}</span>
+                 </Link>
+               ))}
             </div>
           </div>
         </section>
       </AnimatedSection>
 
-      {/* Mandate Section */}
+      {/* Infrastructure Alerts */}
+      <AnimatedSection direction="up">
+        <section id="alerts" className="mx-auto max-w-7xl px-5 py-12 lg:px-10">
+           <div className="bg-[#CE1126]/5 border border-[#CE1126]/20 rounded-sm p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+              <div className="flex items-start gap-4">
+                 <div className="h-10 w-10 shrink-0 bg-[#CE1126] text-white flex items-center justify-center rounded-sm">
+                    <AlertTriangle className="h-6 w-6" />
+                 </div>
+                 <div>
+                    <h3 className="text-lg font-bold text-slate-900">National Infrastructure Advisory</h3>
+                    <p className="text-slate-700 mt-1">All contractors undertaking excavation works along the N6 highway corridor must coordinate with GWCL and ECG before commencement to prevent service disruption.</p>
+                 </div>
+              </div>
+              <Link href="/news" className="shrink-0 text-sm font-bold text-[#CE1126] hover:underline whitespace-nowrap">
+                 View Details &rarr;
+              </Link>
+           </div>
+        </section>
+      </AnimatedSection>
+
+      {/* National Impact Section */}
       <AnimatedSection direction="up" delay={0.1}>
-        <section id="mandate" className="mx-auto max-w-7xl px-5 py-24 lg:px-10">
-          <div className="mx-auto max-w-3xl text-center">
-            <p className="mb-4 text-sm font-black uppercase tracking-[0.2em] text-brand-secondary">
-              Core Mandate
-            </p>
-            <h2 className="text-4xl font-extrabold tracking-tight text-slate-900 md:text-5xl">
-              A national coordination body for roads, utilities and development.
+        <section className="mx-auto max-w-7xl px-5 py-16 lg:px-10">
+          <div className="mb-12">
+            <p className="mb-2 text-sm font-black uppercase tracking-[0.1em] text-slate-500">National Impact</p>
+            <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 md:text-4xl">
+              Coordinating at a National Scale.
             </h2>
           </div>
 
-          <div className="mt-16 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {mandate.map((item) => (
-              <div
-                key={item.title}
-                className="group relative overflow-hidden rounded-sm border border-slate-200 bg-white p-8 transition-all hover:-translate-y-1 hover:border-brand-primary hover:shadow-xl hover:shadow-slate-200/50"
-              >
-                <div className="absolute top-0 right-0 h-16 w-16 bg-slate-50 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-150"></div>
-                <div className={`relative mb-6 inline-flex h-14 w-14 items-center justify-center rounded-sm ${item.color} transition-transform group-hover:scale-110`}>
-                  <item.icon className="h-7 w-7" />
-                </div>
-                <h3 className="relative mb-3 text-xl font-bold text-slate-900">{item.title}</h3>
-                <p className="relative text-base leading-relaxed text-slate-600">{item.text}</p>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {[
+              { number: "37+", label: "Member Institutions" },
+              { number: "16", label: "Regional Teams" },
+              { number: "9+", label: "Government Ministries" },
+              { number: "1,200+", label: "Projects Coordinated" },
+              { number: "4,500+", label: "Reports Received" },
+              { number: "98%", label: "Resolution Rate" },
+            ].map((stat, i) => (
+              <div key={i} className="bg-slate-900 border border-slate-800 rounded-sm p-6 text-center">
+                <p className="text-3xl font-black text-white">{stat.number}</p>
+                <p className="mt-2 text-xs font-bold uppercase tracking-wider text-slate-400">{stat.label}</p>
               </div>
             ))}
           </div>
         </section>
       </AnimatedSection>
 
-      {/* Coordination Section */}
+      {/* Stakeholder Ecosystem */}
       <AnimatedSection direction="up" delay={0.2}>
-        <section id="coordination" className="bg-slate-900 px-5 py-24 text-white lg:px-10 border-y border-slate-800">
-          <div className="mx-auto grid max-w-7xl gap-16 lg:grid-cols-2 lg:items-center">
-            <div>
-              <p className="mb-4 text-sm font-black uppercase tracking-[0.2em] text-brand-accent">
-                Coordination Before Excavation
-              </p>
-              <h2 className="text-4xl font-extrabold tracking-tight md:text-5xl lg:text-6xl lg:leading-[1.1]">
-                One road project can affect water, power, fibre and public safety.
-              </h2>
-              <div className="mt-8 space-y-6 text-lg leading-relaxed text-slate-300">
-                <p>
-                  NECT exists because infrastructure projects are connected. A road
-                  contractor digging without proper coordination can cut fibre,
-                  damage pipelines, expose electrical cables and create expensive
-                  delays.
-                </p>
-                <p>
-                  The platform helps stakeholders report, verify, coordinate and
-                  track issues before they become national infrastructure problems.
-                </p>
+        <section className="bg-slate-100 border-y border-slate-200 px-5 py-24 lg:px-10 overflow-hidden">
+           <div className="mx-auto max-w-7xl">
+              <div className="text-center mb-16 max-w-3xl mx-auto">
+                 <p className="mb-2 text-sm font-black uppercase tracking-[0.1em] text-brand-primary">Stakeholder Ecosystem</p>
+                 <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 md:text-4xl">
+                   Bringing the nation&apos;s infrastructure operators together.
+                 </h2>
               </div>
               
-              <div className="mt-10">
-                 <div className="inline-flex items-center gap-4 rounded-sm bg-white/5 px-6 py-5 border border-white/10">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-sm bg-brand-accent/20">
-                      <BarChart3 className="h-6 w-6 text-brand-accent" />
+              <div className="relative max-w-4xl mx-auto aspect-[16/9] md:aspect-[21/9]">
+                 {/* Center Node */}
+                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 flex flex-col items-center">
+                    <div className="h-24 w-24 bg-white border-4 border-brand-primary rounded-full shadow-2xl flex items-center justify-center p-2 z-20">
+                       <Image src="/NECT.jpeg" alt="NECT" width={60} height={30} className="object-contain" />
                     </div>
-                    <div>
-                      <p className="text-sm font-medium text-slate-400 uppercase tracking-wider">Estimated Annual Savings</p>
-                      <p className="text-2xl font-bold text-white mt-1">GHS 50M+</p>
-                    </div>
+                    <div className="absolute h-32 w-32 bg-brand-primary/10 rounded-full animate-ping -z-10"></div>
                  </div>
-              </div>
-            </div>
 
-            <div className="relative aspect-square w-full rounded-sm overflow-hidden bg-slate-800 border border-slate-700">
-              {/* Structural/Architectural visual representation of coordination */}
-              <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'linear-gradient(#ffffff 1px, transparent 1px), linear-gradient(90deg, #ffffff 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
-              <div className="absolute inset-0 flex items-center justify-center p-12">
-                 <div className="relative h-full w-full">
-                   
-                   {/* Decorative structural elements representing infrastructure layers */}
-                   <div className="absolute inset-0 flex flex-col justify-center gap-12">
-                     <div className="relative h-3 w-full bg-slate-900 border border-slate-700">
-                       <div className="absolute left-0 top-0 h-full w-2/3 bg-[#FCD116]"></div>
-                       <span className="absolute -top-6 left-0 text-xs font-mono text-slate-400 uppercase">Power Lines (ECG)</span>
-                     </div>
-                     <div className="relative h-3 w-full bg-slate-900 border border-slate-700">
-                       <div className="absolute left-0 top-0 h-full w-1/2 bg-[#CE1126]"></div>
-                       <span className="absolute -top-6 left-0 text-xs font-mono text-slate-400 uppercase">Fibre Optic (Telcos)</span>
-                     </div>
-                     <div className="relative h-3 w-full bg-slate-900 border border-slate-700">
-                       <div className="absolute left-0 top-0 h-full w-4/5 bg-[#006B3F]"></div>
-                       <span className="absolute -top-6 left-0 text-xs font-mono text-slate-400 uppercase">Water Mains (GWCL)</span>
-                     </div>
-                   </div>
-                   
-                   {/* Intersection marker */}
-                   <div className="absolute left-1/2 top-1/4 bottom-1/4 w-px bg-white border-l border-dashed border-white/50">
-                      <div className="absolute top-1/2 -left-3 h-6 w-6 rounded-sm border-2 border-white bg-slate-900 flex items-center justify-center">
-                         <div className="h-2 w-2 bg-brand-accent"></div>
-                      </div>
-                   </div>
-                   
-                 </div>
+                 {/* Connecting lines SVG */}
+                 <svg className="absolute inset-0 h-full w-full" style={{ zIndex: 0 }}>
+                    <line x1="50%" y1="50%" x2="15%" y2="20%" stroke="#cbd5e1" strokeWidth="2" strokeDasharray="5,5" />
+                    <line x1="50%" y1="50%" x2="85%" y2="20%" stroke="#cbd5e1" strokeWidth="2" strokeDasharray="5,5" />
+                    <line x1="50%" y1="50%" x2="10%" y2="50%" stroke="#cbd5e1" strokeWidth="2" strokeDasharray="5,5" />
+                    <line x1="50%" y1="50%" x2="90%" y2="50%" stroke="#cbd5e1" strokeWidth="2" strokeDasharray="5,5" />
+                    <line x1="50%" y1="50%" x2="25%" y2="85%" stroke="#cbd5e1" strokeWidth="2" strokeDasharray="5,5" />
+                    <line x1="50%" y1="50%" x2="75%" y2="85%" stroke="#cbd5e1" strokeWidth="2" strokeDasharray="5,5" />
+                 </svg>
+
+                 {/* Surrounding Nodes */}
+                 <div className="absolute top-[20%] left-[15%] -translate-x-1/2 -translate-y-1/2 bg-white border border-slate-200 px-4 py-2 rounded-sm shadow-sm font-bold text-sm text-slate-700 z-10">Road Agencies</div>
+                 <div className="absolute top-[20%] left-[85%] -translate-x-1/2 -translate-y-1/2 bg-white border border-slate-200 px-4 py-2 rounded-sm shadow-sm font-bold text-sm text-slate-700 z-10">Utility Providers (ECG, GWCL)</div>
+                 <div className="absolute top-[50%] left-[10%] -translate-x-1/2 -translate-y-1/2 bg-white border border-slate-200 px-4 py-2 rounded-sm shadow-sm font-bold text-sm text-slate-700 z-10">Telecom Operators</div>
+                 <div className="absolute top-[50%] left-[90%] -translate-x-1/2 -translate-y-1/2 bg-white border border-slate-200 px-4 py-2 rounded-sm shadow-sm font-bold text-sm text-slate-700 z-10">Local Assemblies (MMDAs)</div>
+                 <div className="absolute top-[85%] left-[25%] -translate-x-1/2 -translate-y-1/2 bg-white border border-slate-200 px-4 py-2 rounded-sm shadow-sm font-bold text-sm text-slate-700 z-10">Contractors</div>
+                 <div className="absolute top-[85%] left-[75%] -translate-x-1/2 -translate-y-1/2 bg-white border border-slate-200 px-4 py-2 rounded-sm shadow-sm font-bold text-sm text-slate-700 z-10">Govt Ministries</div>
               </div>
-            </div>
-          </div>
+           </div>
         </section>
       </AnimatedSection>
 
-      {/* Portal Section */}
+      {/* News & Media Centre */}
       <AnimatedSection direction="up" delay={0.1}>
-        <section id="portal" className="mx-auto max-w-7xl px-5 py-24 lg:px-10">
-          <div className="relative overflow-hidden rounded-sm bg-slate-900 border border-slate-800 p-8 shadow-2xl md:p-16 lg:p-20">
-            <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'linear-gradient(#ffffff 1px, transparent 1px), linear-gradient(90deg, #ffffff 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
-            <div className="absolute right-0 top-0 h-full w-1/3 bg-gradient-to-l from-brand-primary/20 to-transparent"></div>
-            
-            <div className="relative z-10 grid gap-12 lg:grid-cols-2 lg:items-center">
-              <div>
-                <div className="mb-8 inline-flex h-16 w-16 items-center justify-center rounded-sm bg-brand-accent text-slate-900 shadow-lg">
-                  <MapPinned className="h-8 w-8" />
-                </div>
-                <h2 className="text-4xl font-extrabold tracking-tight text-white md:text-5xl">
-                  Citizen Infrastructure Reporting Portal.
-                </h2>
-              </div>
-
-              <div className="flex flex-col items-start lg:pl-10">
-                <p className="text-lg leading-relaxed text-slate-300">
-                  Citizens can report road reservation encroachment, illegal
-                  structures, exposed cables, burst pipes, unauthorized excavation
-                  and other infrastructure concerns. Reports may be submitted
-                  anonymously or with contact details.
-                </p>
-
-                <Link
-                  href="/report"
-                  className="mt-10 btn-accent group"
-                >
-                  Open Reporting Portal
-                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </Link>
-              </div>
+        <section className="mx-auto max-w-7xl px-5 py-24 lg:px-10">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
+            <div>
+              <p className="mb-2 text-sm font-black uppercase tracking-[0.1em] text-slate-500">News & Media Centre</p>
+              <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 md:text-4xl">
+                Latest Updates & Press Releases.
+              </h2>
             </div>
+            <Link href="/news" className="text-sm font-bold text-brand-primary hover:underline">
+              View All News &rarr;
+            </Link>
+          </div>
+
+          <div className="grid gap-8 md:grid-cols-3">
+            {newsArticles && newsArticles.length > 0 ? (
+               newsArticles.map((article) => (
+                 <Link href={`/news/${article.id}`} key={article.id} className="group flex flex-col bg-white border border-slate-200 rounded-sm overflow-hidden hover:border-brand-primary hover:shadow-lg transition-all">
+                    {article.image_url ? (
+                       <div className="h-48 relative overflow-hidden bg-slate-100">
+                          <Image src={article.image_url} alt="" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover transition-transform duration-500 group-hover:scale-105" />
+                       </div>
+                    ) : (
+                       <div className="h-48 bg-slate-100 flex items-center justify-center">
+                          <Newspaper className="h-8 w-8 text-slate-300" />
+                       </div>
+                    )}
+                    <div className="p-6 flex-1 flex flex-col">
+                       <div className="flex items-center gap-2 mb-3">
+                         <span className="text-xs font-bold uppercase tracking-wider text-brand-primary">{article.category}</span>
+                         <span className="text-xs text-slate-500">• {new Date(article.created_at).toLocaleDateString()}</span>
+                       </div>
+                       <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-brand-primary transition-colors">{article.title}</h3>
+                       <p className="text-slate-600 text-sm line-clamp-3 mb-4 flex-1">{article.excerpt}</p>
+                       <span className="text-sm font-bold text-brand-primary mt-auto">Read more &rarr;</span>
+                    </div>
+                 </Link>
+               ))
+            ) : (
+               <div className="col-span-3 text-center py-12 border border-dashed border-slate-300 rounded-sm">
+                  <p className="text-slate-500">No recent news available.</p>
+               </div>
+            )}
           </div>
         </section>
       </AnimatedSection>

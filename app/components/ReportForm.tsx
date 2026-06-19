@@ -2,13 +2,59 @@
 
 import { useState } from "react";
 import { supabase } from "@/app/lib/supabase";
-import { Loader2, CheckCircle2, User, UserX, Camera, MapPin, AlignLeft, Info } from "lucide-react";
+import { Loader2, CheckCircle2, User, UserX, Camera, MapPin, AlignLeft, Info, Crosshair, Search } from "lucide-react";
 
 export default function ReportForm() {
+  const [activeTab, setActiveTab] = useState<"submit" | "track">("submit");
   const [anonymous, setAnonymous] = useState(true);
   const [loading, setLoading] = useState(false);
   const [reference, setReference] = useState("");
   const [fileName, setFileName] = useState<string | null>(null);
+  
+  // Tracking state
+  const [trackRef, setTrackRef] = useState("");
+  const [trackResult, setTrackResult] = useState<any>(null);
+  const [trackLoading, setTrackLoading] = useState(false);
+
+  const handleGetLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude.toFixed(6);
+          const lng = position.coords.longitude.toFixed(6);
+          const locationInput = document.querySelector('input[name="location"]') as HTMLInputElement;
+          if (locationInput) {
+            locationInput.value = `${lat}, ${lng}`;
+          }
+        },
+        (error) => {
+          alert("Could not get location. Please ensure location services are enabled.");
+        }
+      );
+    } else {
+      alert("Geolocation is not supported by this browser.");
+    }
+  };
+
+  const handleTrack = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!trackRef) return;
+    setTrackLoading(true);
+    setTrackResult(null);
+    
+    const { data, error } = await supabase
+      .from("reports")
+      .select("reference, status, created_at, report_type")
+      .eq("reference", trackRef)
+      .single();
+      
+    if (error || !data) {
+      setTrackResult({ error: "Report not found. Please check your reference code." });
+    } else {
+      setTrackResult(data);
+    }
+    setTrackLoading(false);
+  };
 
   async function submitReport(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -107,20 +153,109 @@ export default function ReportForm() {
           </p>
         </div>
         <button
-           onClick={() => setReference("")}
+           onClick={() => {
+             setReference("");
+             setActiveTab("track");
+           }}
            className="mt-8 text-sm font-semibold text-brand-primary hover:underline"
         >
-          Submit another report
+          Track this report
         </button>
       </div>
     );
   }
 
   return (
-    <form
-      onSubmit={submitReport}
-      className="space-y-8 animate-in fade-in duration-500"
-    >
+    <div className="animate-in fade-in duration-500">
+      <div className="mb-8 flex space-x-2 rounded-xl border border-slate-200 bg-slate-50 p-1">
+        <button
+          onClick={() => setActiveTab("submit")}
+          className={`flex-1 rounded-lg py-3 text-sm font-bold transition-all ${
+            activeTab === "submit"
+              ? "bg-white text-brand-primary shadow-sm ring-1 ring-slate-200/50"
+              : "text-slate-500 hover:text-slate-700"
+          }`}
+        >
+          Submit Report
+        </button>
+        <button
+          onClick={() => setActiveTab("track")}
+          className={`flex-1 rounded-lg py-3 text-sm font-bold transition-all ${
+            activeTab === "track"
+              ? "bg-white text-brand-primary shadow-sm ring-1 ring-slate-200/50"
+              : "text-slate-500 hover:text-slate-700"
+          }`}
+        >
+          Track Status
+        </button>
+      </div>
+
+      {activeTab === "track" ? (
+        <form onSubmit={handleTrack} className="space-y-6">
+          <div>
+            <label className="text-sm font-bold uppercase tracking-wider text-slate-900 flex items-center gap-2 mb-4">
+              <Search className="h-4 w-4 text-slate-400" />
+              Check Report Status
+            </label>
+            <p className="text-sm text-slate-500 mb-4">
+              Enter your NECT tracking reference to view the current status of your report.
+            </p>
+            <input
+              type="text"
+              required
+              value={trackRef}
+              onChange={(e) => setTrackRef(e.target.value)}
+              placeholder="e.g. NECT-2024-123456"
+              className="input text-center text-lg tracking-widest font-mono"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={trackLoading}
+            className="btn-primary w-full py-4 text-lg shadow-xl shadow-brand-primary/20 flex items-center justify-center gap-2"
+          >
+            {trackLoading && <Loader2 className="h-5 w-5 animate-spin" />}
+            {trackLoading ? "Searching..." : "Track Report"}
+          </button>
+
+          {trackResult && (
+            <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 p-6">
+              {trackResult.error ? (
+                <p className="text-center font-semibold text-red-600">{trackResult.error}</p>
+              ) : (
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center border-b border-slate-200 pb-4">
+                    <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">Reference</span>
+                    <span className="font-mono font-bold text-slate-900">{trackResult.reference}</span>
+                  </div>
+                  <div className="flex justify-between items-center border-b border-slate-200 pb-4">
+                    <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">Type</span>
+                    <span className="font-medium text-slate-900">{trackResult.report_type}</span>
+                  </div>
+                  <div className="flex justify-between items-center border-b border-slate-200 pb-4">
+                    <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">Date</span>
+                    <span className="font-medium text-slate-900">{new Date(trackResult.created_at).toLocaleDateString()}</span>
+                  </div>
+                  <div className="flex justify-between items-center pt-2">
+                    <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">Status</span>
+                    <span className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-bold ${
+                      trackResult.status === 'Resolved' || trackResult.status === 'Closed' ? 'bg-emerald-100 text-emerald-700' :
+                      trackResult.status === 'In Progress' || trackResult.status === 'Site Inspection' ? 'bg-blue-100 text-blue-700' :
+                      'bg-amber-100 text-amber-700'
+                    }`}>
+                      {trackResult.status}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </form>
+      ) : (
+        <form
+          onSubmit={submitReport}
+          className="space-y-8 animate-in fade-in duration-500"
+        >
       <div>
         <label className="text-sm font-bold uppercase tracking-wider text-slate-900 flex items-center gap-2 mb-4">
           <Info className="h-4 w-4 text-slate-400" />
@@ -192,14 +327,24 @@ export default function ReportForm() {
           </select>
         </div>
 
-        <div className="relative">
-          <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 pointer-events-none" />
-          <input
-            name="location"
-            required
-            placeholder="Location / landmark (e.g. Near Achimota Mall)"
-            className="input pl-12"
-          />
+        <div className="relative flex items-center gap-2">
+          <div className="relative flex-1">
+            <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 pointer-events-none" />
+            <input
+              name="location"
+              required
+              placeholder="Location / landmark (e.g. Near Achimota Mall)"
+              className="input pl-12"
+            />
+          </div>
+          <button
+            type="button"
+            onClick={handleGetLocation}
+            className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 hover:text-brand-primary transition-colors"
+            title="Get Current Location"
+          >
+            <Crosshair className="h-5 w-5" />
+          </button>
         </div>
 
         <div className="relative">
@@ -218,15 +363,15 @@ export default function ReportForm() {
             <div className="flex flex-col items-center justify-center pb-2 pt-1 text-center">
               <Camera className="mb-3 h-8 w-8 text-slate-400" />
               <p className="text-sm font-semibold text-slate-700">
-                {fileName ? fileName : "Click to upload a photo (optional)"}
+                {fileName ? fileName : "Click to upload a photo or video (optional)"}
               </p>
-              <p className="text-xs text-slate-500 mt-1">PNG, JPG up to 10MB</p>
+              <p className="text-xs text-slate-500 mt-1">PNG, JPG, MP4 up to 50MB</p>
             </div>
             <input 
-              title="Upload photo" 
+              title="Upload media" 
               name="photo" 
               type="file" 
-              accept="image/*" 
+              accept="image/*,video/*" 
               className="hidden" 
               onChange={(e) => {
                 if (e.target.files && e.target.files.length > 0) {
@@ -246,5 +391,7 @@ export default function ReportForm() {
         {loading ? "Submitting report..." : "Submit Report"}
       </button>
     </form>
+      )}
+    </div>
   );
 }

@@ -20,6 +20,7 @@ export default function Header() {
         <nav className="hidden items-center gap-8 text-sm font-semibold text-slate-600 lg:flex">
           <Link href="/about" className="transition-colors hover:text-slate-900">About NECT</Link>
           <Link href="/agencies" className="transition-colors hover:text-slate-900">Agencies</Link>
+          <Link href="/resources" className="transition-colors hover:text-slate-900">Resources</Link>
           <Link href="/news" className="transition-colors hover:text-slate-900">News & Press</Link>
           <Link href="/gallery" className="transition-colors hover:text-slate-900">Gallery</Link>
           <Link href="/videos" className="transition-colors hover:text-slate-900">Videos</Link>
@@ -49,6 +50,7 @@ export default function Header() {
           <nav className="flex flex-col gap-4 text-sm font-semibold text-slate-600">
             <Link href="/about" onClick={() => setIsMobileMenuOpen(false)} className="py-2 hover:text-slate-900">About NECT</Link>
             <Link href="/agencies" onClick={() => setIsMobileMenuOpen(false)} className="py-2 hover:text-slate-900">Agencies</Link>
+            <Link href="/resources" onClick={() => setIsMobileMenuOpen(false)} className="py-2 hover:text-slate-900">Resources</Link>
             <Link href="/news" onClick={() => setIsMobileMenuOpen(false)} className="py-2 hover:text-slate-900">News & Press</Link>
             <Link href="/gallery" onClick={() => setIsMobileMenuOpen(false)} className="py-2 hover:text-slate-900">Gallery</Link>
             <Link href="/videos" onClick={() => setIsMobileMenuOpen(false)} className="py-2 hover:text-slate-900">Videos</Link>
