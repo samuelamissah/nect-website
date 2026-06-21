@@ -6,6 +6,7 @@ import { Calendar, ArrowLeft, Loader2, Share2, Bookmark } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState, use } from "react";
+import { useRouter } from 'next/navigation';
 import { supabase } from "@/app/lib/supabase";
 import { motion, Variants } from "framer-motion";
 import { slugify } from "@/app/lib/slugify";
@@ -66,6 +67,29 @@ export default function ArticlePage({ params }: { params: Promise<{ id: string }
 
     fetchArticle();
   }, [resolvedParams.id]);
+
+  const router = useRouter();
+
+  // Redirect to canonical URL (id + slug) if the slug part doesn't match the article.slug
+  useEffect(() => {
+    if (!loading && article && article.slug) {
+      const param = String(resolvedParams.id || '');
+      let slugPart = '';
+      if (param.startsWith(id + '-')) {
+        slugPart = param.slice(id.length + 1);
+      } else if (param.includes('-')) {
+        // fallback: everything after the first hyphen(s)
+        const parts = param.split('-');
+        parts.shift();
+        slugPart = parts.join('-');
+      }
+      try { slugPart = decodeURIComponent(slugPart); } catch (e) {}
+
+      if (article.slug && slugPart !== article.slug) {
+        router.replace(`/news/${id}-${encodeURIComponent(article.slug)}`);
+      }
+    }
+  }, [loading, article, id, resolvedParams.id, router]);
 
   if (loading) {
     return (
