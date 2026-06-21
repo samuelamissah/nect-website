@@ -65,13 +65,26 @@ export default function AdminReports() {
 
   async function saveNotes() {
     if (!selectedReport) return;
-    const { error } = await supabase.from("reports").update({ internal_notes: notes }).eq("id", selectedReport.id);
-    if (!error) {
-      toast.success("Internal notes saved successfully");
-      setReports(reports.map(r => r.id === selectedReport.id ? { ...r, internal_notes: notes } : r));
-      setSelectedReport({ ...selectedReport, internal_notes: notes });
-    } else {
-      toast.error("Failed to save notes");
+    try {
+      // First try to save assuming internal_notes exists
+      const { error } = await supabase.from("reports").update({ internal_notes: notes }).eq("id", selectedReport.id);
+      
+      if (error && error.message.includes("Could not find the 'internal_notes' column")) {
+        toast.error("Database missing 'internal_notes' column. Please ask administrator to run: ALTER TABLE reports ADD COLUMN internal_notes TEXT;");
+        return;
+      }
+      
+      if (!error) {
+        toast.success("Internal notes saved successfully");
+        setReports(reports.map(r => r.id === selectedReport.id ? { ...r, internal_notes: notes } : r));
+        setSelectedReport({ ...selectedReport, internal_notes: notes });
+      } else {
+        console.error("Notes save error:", error);
+        toast.error("Failed to save notes: " + error.message);
+      }
+    } catch (err: any) {
+      console.error("Notes save exception:", err);
+      toast.error("Failed to save notes: " + err.message);
     }
   }
 

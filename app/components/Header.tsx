@@ -24,7 +24,7 @@ export default function Header() {
           <Link href="/news" className="transition-colors hover:text-slate-900">News & Press</Link>
           <Link href="/gallery" className="transition-colors hover:text-slate-900">Gallery</Link>
           <Link href="/videos" className="transition-colors hover:text-slate-900">Videos</Link>
-          <Link href="/#portal" className="transition-colors hover:text-slate-900">Citizen Portal</Link>
+          <Link href="/report" className="transition-colors hover:text-slate-900">Citizen Portal</Link>
           <Link href="/track" className="transition-colors hover:text-slate-900">Track Report</Link>
         </nav>
 
@@ -54,7 +54,7 @@ export default function Header() {
             <Link href="/news" onClick={() => setIsMobileMenuOpen(false)} className="py-2 hover:text-slate-900">News & Press</Link>
             <Link href="/gallery" onClick={() => setIsMobileMenuOpen(false)} className="py-2 hover:text-slate-900">Gallery</Link>
             <Link href="/videos" onClick={() => setIsMobileMenuOpen(false)} className="py-2 hover:text-slate-900">Videos</Link>
-            <Link href="/#portal" onClick={() => setIsMobileMenuOpen(false)} className="py-2 hover:text-slate-900">Citizen Portal</Link>
+            <Link href="/report" onClick={() => setIsMobileMenuOpen(false)} className="py-2 hover:text-slate-900">Citizen Portal</Link>
             <Link href="/track" onClick={() => setIsMobileMenuOpen(false)} className="py-2 hover:text-slate-900">Track Report</Link>
             <Link href="/report" onClick={() => setIsMobileMenuOpen(false)} className="sm:hidden mt-2 rounded-sm bg-[#CE1126] px-4 py-3 text-center text-white font-bold">
               Report Issue

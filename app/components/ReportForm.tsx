@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { supabase } from "@/app/lib/supabase";
 import { Loader2, CheckCircle2, User, UserX, Camera, MapPin, AlignLeft, Info, Crosshair, Search } from "lucide-react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 export default function ReportForm() {
   const [activeTab, setActiveTab] = useState<"submit" | "track">("submit");
@@ -15,20 +16,44 @@ export default function ReportForm() {
   const [trackRef, setTrackRef] = useState("");
   const [trackResult, setTrackResult] = useState<any>(null);
   const [trackLoading, setTrackLoading] = useState(false);
+  const [locationLoading, setLocationLoading] = useState(false);
 
   const handleGetLocation = () => {
     if (navigator.geolocation) {
+      setLocationLoading(true);
       navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const lat = position.coords.latitude.toFixed(6);
-          const lng = position.coords.longitude.toFixed(6);
+        async (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
           const locationInput = document.querySelector('input[name="location"]') as HTMLInputElement;
+          
           if (locationInput) {
-            locationInput.value = `${lat}, ${lng}`;
+            locationInput.value = "Fetching address...";
+            try {
+              const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`);
+              const data = await response.json();
+              if (data && data.display_name) {
+                const address = data.address;
+                const shortAddress = [
+                  address.road, 
+                  address.suburb || address.neighbourhood, 
+                  address.city || address.town || address.village, 
+                  address.state
+                ].filter(Boolean).join(", ");
+                
+                locationInput.value = shortAddress || data.display_name;
+              } else {
+                locationInput.value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+              }
+            } catch (err) {
+              locationInput.value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+            }
           }
+          setLocationLoading(false);
         },
         (error) => {
           alert("Could not get location. Please ensure location services are enabled.");
+          setLocationLoading(false);
         }
       );
     } else {
@@ -340,10 +365,11 @@ export default function ReportForm() {
           <button
             type="button"
             onClick={handleGetLocation}
-            className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 hover:text-brand-primary transition-colors"
+            disabled={locationLoading}
+            className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 hover:text-brand-primary transition-colors disabled:opacity-70"
             title="Get Current Location"
           >
-            <Crosshair className="h-5 w-5" />
+            {locationLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Crosshair className="h-5 w-5" />}
           </button>
         </div>
 

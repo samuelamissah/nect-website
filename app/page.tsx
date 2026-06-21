@@ -34,6 +34,34 @@ export default async function Home() {
     .order("created_at", { ascending: false })
     .limit(3);
 
+  // Fetch homepage content
+  const { data: contentData } = await supabase
+    .from("homepage_content")
+    .select("*");
+    
+  const contentMap: Record<string, string> = {};
+  if (contentData) {
+    contentData.forEach((item) => {
+      contentMap[item.id] = item.value;
+    });
+  }
+
+  // Default values fallback
+  const heroTitle = contentMap.hero_title || "Protecting Ghana's Infrastructure Through Engineering Coordination.";
+  const heroSubtitle = contentMap.hero_subtitle || "NECT brings together road agencies, utility providers, contractors, local authorities, engineers and government institutions to protect road reservations, prevent utility damage and support sustainable national development.";
+  
+  const statsAgencies = contentMap.stats_agencies || "37+";
+  const statsRegions = contentMap.stats_regions || "16";
+  const statsMinistries = contentMap.stats_ministries || "9+";
+  const statsProjects = contentMap.stats_projects || "1,200+";
+  const statsReports = contentMap.stats_reports || "4,500+";
+  const statsResolution = contentMap.stats_resolution || "98%";
+
+  const alertActive = contentMap.alert_active === "true";
+  const alertTitle = contentMap.alert_title || "National Infrastructure Advisory";
+  const alertDescription = contentMap.alert_description || "All contractors undertaking excavation works along the N6 highway corridor must coordinate with GWCL and ECG before commencement to prevent service disruption.";
+  const alertLink = contentMap.alert_link || "/news";
+
   return (
     <main className="min-h-screen bg-slate-50 selection:bg-brand-secondary selection:text-white">
       <Header />
@@ -51,11 +79,11 @@ export default async function Home() {
             </div>
 
             <h1 className="text-5xl font-extrabold leading-[1.1] tracking-tight text-slate-900 sm:text-6xl lg:text-6xl">
-              Protecting Ghana&apos;s Infrastructure Through Engineering Coordination.
+              {heroTitle}
             </h1>
 
-            <p className="mt-8 text-lg leading-relaxed text-slate-600 sm:text-xl font-medium">
-              NECT brings together road agencies, utility providers, contractors, local authorities, engineers and government institutions to protect road reservations, prevent utility damage and support sustainable national development.
+            <p className="mt-8 text-lg leading-relaxed text-slate-600 sm:text-xl font-medium whitespace-pre-line">
+              {heroSubtitle}
             </p>
 
             <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
@@ -133,24 +161,26 @@ export default async function Home() {
       </AnimatedSection>
 
       {/* Infrastructure Alerts */}
-      <AnimatedSection direction="up">
-        <section id="alerts" className="mx-auto max-w-7xl px-5 py-12 lg:px-10">
-           <div className="bg-[#CE1126]/5 border border-[#CE1126]/20 rounded-sm p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-              <div className="flex items-start gap-4">
-                 <div className="h-10 w-10 shrink-0 bg-[#CE1126] text-white flex items-center justify-center rounded-sm">
-                    <AlertTriangle className="h-6 w-6" />
-                 </div>
-                 <div>
-                    <h3 className="text-lg font-bold text-slate-900">National Infrastructure Advisory</h3>
-                    <p className="text-slate-700 mt-1">All contractors undertaking excavation works along the N6 highway corridor must coordinate with GWCL and ECG before commencement to prevent service disruption.</p>
-                 </div>
-              </div>
-              <Link href="/news" className="shrink-0 text-sm font-bold text-[#CE1126] hover:underline whitespace-nowrap">
-                 View Details &rarr;
-              </Link>
-           </div>
-        </section>
-      </AnimatedSection>
+      {alertActive && (
+        <AnimatedSection direction="up">
+          <section id="alerts" className="mx-auto max-w-7xl px-5 py-12 lg:px-10">
+             <div className="bg-[#CE1126]/5 border border-[#CE1126]/20 rounded-sm p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                <div className="flex items-start gap-4">
+                   <div className="h-10 w-10 shrink-0 bg-[#CE1126] text-white flex items-center justify-center rounded-sm">
+                      <AlertTriangle className="h-6 w-6" />
+                   </div>
+                   <div>
+                      <h3 className="text-lg font-bold text-slate-900">{alertTitle}</h3>
+                      <p className="text-slate-700 mt-1">{alertDescription}</p>
+                   </div>
+                </div>
+                <Link href={alertLink} className="shrink-0 text-sm font-bold text-[#CE1126] hover:underline whitespace-nowrap">
+                   View Details &rarr;
+                </Link>
+             </div>
+          </section>
+        </AnimatedSection>
+      )}
 
       {/* National Impact Section */}
       <AnimatedSection direction="up" delay={0.1}>
@@ -164,12 +194,12 @@ export default async function Home() {
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {[
-              { number: "37+", label: "Member Institutions" },
-              { number: "16", label: "Regional Teams" },
-              { number: "9+", label: "Government Ministries" },
-              { number: "1,200+", label: "Projects Coordinated" },
-              { number: "4,500+", label: "Reports Received" },
-              { number: "98%", label: "Resolution Rate" },
+              { number: statsAgencies, label: "Member Institutions" },
+              { number: statsRegions, label: "Regional Teams" },
+              { number: statsMinistries, label: "Government Ministries" },
+              { number: statsProjects, label: "Projects Coordinated" },
+              { number: statsReports, label: "Reports Received" },
+              { number: statsResolution, label: "Resolution Rate" },
             ].map((stat, i) => (
               <div key={i} className="bg-slate-900 border border-slate-800 rounded-sm p-6 text-center">
                 <p className="text-3xl font-black text-white">{stat.number}</p>

@@ -5,6 +5,9 @@ import { Sphere, Text, Line, OrbitControls, Float } from "@react-three/drei";
 import { useRef, useMemo } from "react";
 import * as THREE from "three";
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+
 function Particle({ curve, speed, color, initialProgress }: any) {
   const ref = useRef<THREE.Mesh>(null);
   const progress = useRef(initialProgress);
@@ -127,8 +130,8 @@ function Visualization() {
       label: "Road Networks",
       color: "#e2e8f0", // slate-200
       start: [-3.5, 1.5, 0],
-      cp1: [-2, 1.5, 1],
-      cp2: [-1, 0.5, 0.5],
+      controlPoint1: [-2, 1.5, 1],
+      controlPoint2: [-1, 0.5, 0.5],
       end: [0, 0, 0],
       labelPos: [-3.5, 1.8, 0],
     },
@@ -136,8 +139,8 @@ function Visualization() {
       label: "Power Infrastructure",
       color: "#fb923c", // orange-400
       start: [3.5, 1.5, 0],
-      cp1: [2, 1.5, -1],
-      cp2: [1, 0.5, -0.5],
+      controlPoint1: [2, 1.5, -1],
+      controlPoint2: [1, 0.5, -0.5],
       end: [0, 0, 0],
       labelPos: [3.5, 1.8, 0],
     },
@@ -145,8 +148,8 @@ function Visualization() {
       label: "Water Systems",
       color: "#3b82f6", // blue-500
       start: [-3, -2, 0],
-      cp1: [-1.5, -2, -1],
-      cp2: [-1, -1, -0.5],
+      controlPoint1: [-1.5, -2, -1],
+      controlPoint2: [-1, -1, -0.5],
       end: [0, 0, 0],
       labelPos: [-3, -2.3, 0],
     },
@@ -154,8 +157,8 @@ function Visualization() {
       label: "Fibre Routes",
       color: "#06b6d4", // cyan-500
       start: [3, -2, 0],
-      cp1: [1.5, -2, 1],
-      cp2: [1, -1, 0.5],
+      controlPoint1: [1.5, -2, 1],
+      controlPoint2: [1, -1, 0.5],
       end: [0, 0, 0],
       labelPos: [3, -2.3, 0],
     },
@@ -163,8 +166,8 @@ function Visualization() {
       label: "Utility Corridors",
       color: "#10b981", // emerald-500
       start: [0, 3, -1],
-      cp1: [-0.5, 2, -1],
-      cp2: [-0.2, 1, -0.5],
+      controlPoint1: [-0.5, 2, -1],
+      controlPoint2: [-0.2, 1, -0.5],
       end: [0, 0, 0],
       labelPos: [0, 3.3, -1],
     }

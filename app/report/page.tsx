@@ -3,6 +3,8 @@ import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import { ArrowRight, FileText, Search, ClipboardCheck, Users, Map, ShieldCheck, CheckCircle2 } from "lucide-react";
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 function WorkflowStep({ icon: Icon, title, description, active = false }: any) {
   return (
     <div className={`relative flex flex-col items-center text-center ${active ? 'opacity-100' : 'opacity-60'} transition-opacity`}>
@@ -49,7 +51,7 @@ export default function ReportPage() {
           </h1>
 
           <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-slate-600">
-            Submit a report to the National Engineering Coordinating Team. You can track your report's progress through our resolution workflow.
+            Submit a report to the National Engineering Coordinating Team. You can track your report&apos;s progress through our resolution workflow.
           </p>
         </div>
 

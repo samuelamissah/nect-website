@@ -8,11 +8,18 @@ import { Save, Home, Loader2, LayoutTemplate } from "lucide-react";
 
 export default function AdminHomepage() {
   const [content, setContent] = useState<Record<string, string>>({
-    hero_title: "Coordinating Ghana's Critical Infrastructure.",
-    hero_subtitle: "The National Engineering Coordinating Team (NECT) exists because infrastructure projects are connected.",
+    hero_title: "Protecting Ghana's Infrastructure Through Engineering Coordination.",
+    hero_subtitle: "NECT brings together road agencies, utility providers, contractors, local authorities, engineers and government institutions to protect road reservations, prevent utility damage and support sustainable national development.",
     stats_agencies: "37+",
     stats_regions: "16",
     stats_ministries: "9+",
+    stats_projects: "1,200+",
+    stats_reports: "4,500+",
+    stats_resolution: "98%",
+    alert_active: "true",
+    alert_title: "National Infrastructure Advisory",
+    alert_description: "All contractors undertaking excavation works along the N6 highway corridor must coordinate with GWCL and ECG before commencement to prevent service disruption.",
+    alert_link: "/news",
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -159,6 +166,91 @@ export default function AdminHomepage() {
                 value={content.stats_ministries}
                 onChange={(e) => handleChange("stats_ministries", e.target.value)}
                 className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-brand-primary outline-none font-bold"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Projects Coordinated</label>
+              <input 
+                title="Projects Coordinated"
+                type="text"
+                value={content.stats_projects}
+                onChange={(e) => handleChange("stats_projects", e.target.value)}
+                className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-brand-primary outline-none font-bold"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Reports Received</label>
+              <input 
+                title="Reports Received"
+                type="text"
+                value={content.stats_reports}
+                onChange={(e) => handleChange("stats_reports", e.target.value)}
+                className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-brand-primary outline-none font-bold"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Resolution Rate</label>
+              <input 
+                title="Resolution Rate"
+                type="text"
+                value={content.stats_resolution}
+                onChange={(e) => handleChange("stats_resolution", e.target.value)}
+                className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-brand-primary outline-none font-bold"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Infrastructure Alerts */}
+        <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-bold text-slate-900">Infrastructure Alert Banner</h2>
+            <label className="flex items-center cursor-pointer">
+              <div className="relative">
+                <input 
+                  type="checkbox" 
+                  className="sr-only" 
+                  checked={content.alert_active === "true"}
+                  onChange={(e) => handleChange("alert_active", e.target.checked ? "true" : "false")}
+                />
+                <div className={`block w-10 h-6 rounded-full transition-colors ${content.alert_active === "true" ? "bg-emerald-500" : "bg-slate-300"}`}></div>
+                <div className={`dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${content.alert_active === "true" ? "translate-x-4" : ""}`}></div>
+              </div>
+              <div className="ml-3 text-sm font-medium text-slate-700">
+                {content.alert_active === "true" ? "Active" : "Hidden"}
+              </div>
+            </label>
+          </div>
+          
+          <div className={`space-y-5 transition-opacity ${content.alert_active === "true" ? "opacity-100" : "opacity-50 pointer-events-none"}`}>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Alert Title</label>
+              <input 
+                title="Alert Title"
+                type="text"
+                value={content.alert_title}
+                onChange={(e) => handleChange("alert_title", e.target.value)}
+                className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-brand-primary outline-none font-bold"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Alert Description</label>
+              <textarea 
+                title="Alert Description"
+                value={content.alert_description}
+                onChange={(e) => handleChange("alert_description", e.target.value)}
+                className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:border-brand-primary outline-none resize-none"
+                rows={2}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Call-to-Action Link</label>
+              <input 
+                title="Call-to-Action Link"
+                type="text"
+                value={content.alert_link}
+                onChange={(e) => handleChange("alert_link", e.target.value)}
+                className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-brand-primary outline-none font-mono text-sm"
               />
             </div>
           </div>
