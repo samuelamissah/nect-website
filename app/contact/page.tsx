@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import { supabase } from "@/app/lib/supabase";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import { 
@@ -10,10 +12,12 @@ import {
   Building2, 
   Send, 
   MessageSquare,
-  ArrowRight
+  ArrowRight,
+  CheckCircle2,
+  XCircle,
+  Loader2
 } from "lucide-react";
-
-import { motion, Variants } from "framer-motion";
+import { motion, Variants, AnimatePresence } from "framer-motion";
 
 const fadeInUp: Variants = {
   hidden: { opacity: 0, y: 30 },
@@ -66,6 +70,16 @@ const GlobeIcon = () => (
 );
 
 export default function ContactsPage() {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: ""
+  });
+  const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [referenceNumber, setReferenceNumber] = useState("");
+
   const contactInfo = [
     {
       icon: MapPin,
@@ -147,6 +161,90 @@ export default function ContactsPage() {
       email: "central@nect.gov.gh"
     }
   ];
+
+  const generateReference = () => {
+    const year = new Date().getFullYear();
+    const random = Math.floor(100000 + Math.random() * 900000);
+    return `NECT-${year}-${random}`;
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus("sending");
+    setErrorMessage("");
+    setReferenceNumber("");
+
+    try {
+      const reference = generateReference();
+
+      // 1. Save to Supabase as a report - using columns that exist in your reports table
+      const { error: supabaseError } = await supabase
+        .from("reports")
+        .insert({
+          reference: reference,
+          report_type: formData.subject,
+          description: formData.message,
+          location: "Contact Form Submission",
+          status: "Pending",
+          anonymous: false,
+          full_name: formData.name,
+          email: formData.email,
+          created_at: new Date().toISOString(),
+        });
+
+      if (supabaseError) {
+        console.error("Supabase error:", supabaseError);
+        setStatus("error");
+        setErrorMessage("Failed to save your report. Please try again.");
+        setTimeout(() => setStatus("idle"), 5000);
+        return;
+      }
+
+      // 2. Send email notification
+      try {
+        const response = await fetch("/api/contact", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: formData.name,
+            email: formData.email,
+            subject: formData.subject,
+            message: formData.message,
+            reference: reference,
+          }),
+        });
+
+        const data = await response.json();
+        if (!data.success) {
+          console.error("Email notification failed:", data.error);
+        }
+      } catch (emailError) {
+        console.error("Email error:", emailError);
+        // Still continue - report was saved to database
+      }
+
+      setReferenceNumber(reference);
+      setStatus("success");
+      setFormData({ name: "", email: "", subject: "", message: "" });
+      
+      setTimeout(() => setStatus("idle"), 10000);
+      
+    } catch (error) {
+      console.error("Error:", error);
+      setStatus("error");
+      setErrorMessage("Network error. Please check your connection and try again.");
+      setTimeout(() => setStatus("idle"), 5000);
+    }
+  };
 
   return (
     <main className="min-h-screen bg-slate-50 flex flex-col overflow-x-hidden">
@@ -239,12 +337,16 @@ export default function ContactsPage() {
             <h2 className="text-2xl font-bold text-slate-900 mb-2">Send Us a Message</h2>
             <p className="text-slate-600 mb-6">Fill in the form below and we'll get back to you as soon as possible.</p>
             
-            <form className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm font-bold text-slate-700 mb-1.5">Full Name <span className="text-red-500">*</span></label>
                 <input 
                   type="text" 
+                  name="name"
                   placeholder="Enter your full name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
                   className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-brand-primary focus:border-transparent outline-none transition-all"
                 />
               </div>
@@ -253,7 +355,11 @@ export default function ContactsPage() {
                 <label className="block text-sm font-bold text-slate-700 mb-1.5">Email Address <span className="text-red-500">*</span></label>
                 <input 
                   type="email" 
+                  name="email"
                   placeholder="Enter your email address"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
                   className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-brand-primary focus:border-transparent outline-none transition-all"
                 />
               </div>
@@ -261,14 +367,18 @@ export default function ContactsPage() {
               <div>
                 <label className="block text-sm font-bold text-slate-700 mb-1.5">Subject <span className="text-red-500">*</span></label>
                 <select 
+                  name="subject"
+                  value={formData.subject}
+                  onChange={handleChange}
+                  required
                   className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-brand-primary focus:border-transparent outline-none transition-all"
                 >
                   <option value="">Select a subject</option>
-                  <option value="general">General Inquiry</option>
-                  <option value="report">Report Infrastructure Issue</option>
-                  <option value="coordination">Coordination Request</option>
-                  <option value="feedback">Feedback</option>
-                  <option value="other">Other</option>
+                  <option value="General Inquiry">General Inquiry</option>
+                  <option value="Report Infrastructure Issue">Report Infrastructure Issue</option>
+                  <option value="Coordination Request">Coordination Request</option>
+                  <option value="Feedback">Feedback</option>
+                  <option value="Other">Other</option>
                 </select>
               </div>
               
@@ -276,7 +386,11 @@ export default function ContactsPage() {
                 <label className="block text-sm font-bold text-slate-700 mb-1.5">Message <span className="text-red-500">*</span></label>
                 <textarea 
                   rows={5}
+                  name="message"
                   placeholder="Type your message here..."
+                  value={formData.message}
+                  onChange={handleChange}
+                  required
                   className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-brand-primary focus:border-transparent outline-none transition-all resize-none"
                 />
               </div>
@@ -285,11 +399,64 @@ export default function ContactsPage() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 type="submit"
-                className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-brand-primary px-6 py-3.5 text-sm font-bold text-white hover:bg-brand-primary/90 transition-colors"
+                disabled={status === "sending"}
+                className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-brand-primary px-6 py-3.5 text-sm font-bold text-white hover:bg-brand-primary/90 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                Send Message
-                <Send className="h-4 w-4" />
+                {status === "sending" ? (
+                  <>
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    Send Message
+                    <Send className="h-4 w-4" />
+                  </>
+                )}
               </motion.button>
+
+              {/* Success/Error Messages */}
+              <AnimatePresence>
+                {status === "success" && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700"
+                  >
+                    <div className="flex items-start gap-3">
+                      <CheckCircle2 className="h-5 w-5 shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-medium">Thank you! Your message has been sent successfully.</p>
+                        {referenceNumber && (
+                          <p className="mt-2 text-sm">
+                            Your reference number: <span className="font-bold font-mono bg-emerald-100 px-2 py-0.5 rounded">{referenceNumber}</span>
+                          </p>
+                        )}
+                        {referenceNumber && (
+                          <p className="mt-1 text-sm">
+                            <a href="/track" className="text-brand-primary hover:underline font-medium">
+                              Track your report →
+                            </a>
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
+                {status === "error" && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="flex items-center gap-3 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700"
+                  >
+                    <XCircle className="h-5 w-5 shrink-0" />
+                    <span className="font-medium">{errorMessage}</span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </form>
           </motion.div>
 
@@ -355,6 +522,19 @@ export default function ContactsPage() {
                   <GlobeIcon />
                 </motion.a>
               </div>
+            </div>
+
+            <div className="bg-brand-primary/5 rounded-2xl border border-brand-primary/10 p-6">
+              <h4 className="font-semibold text-slate-900 mb-2">Track Your Report</h4>
+              <p className="text-sm text-slate-600 mb-3">
+                Have a reference number? Check the status of your report.
+              </p>
+              <a
+                href="/track"
+                className="inline-flex items-center gap-2 text-sm font-bold text-brand-primary hover:text-brand-primary/80 transition-colors"
+              >
+                Go to Tracking Portal →
+              </a>
             </div>
           </motion.div>
         </div>

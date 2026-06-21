@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/app/lib/supabase";
-import { Plus, Image as ImageIcon, Video, Trash2, Edit, XCircle, Loader2 } from "lucide-react";
+import { Plus, Image as ImageIcon, Trash2, Edit, XCircle, Loader2 } from "lucide-react";
 import Image from "next/image";
 import toast from "react-hot-toast";
+import TiptapEditor from "@/app/components/TipTapEditor";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -42,7 +43,7 @@ export default function AdminNews() {
     let image_url = editingArticle ? editingArticle.image_url : null;
     if (selectedFile) {
       const fileExt = selectedFile.name.split('.').pop();
-      const fileName = `${Math.random()}.${fileExt}`;
+      const fileName = `${crypto.randomUUID()}.${fileExt}`;
       const filePath = `news/${fileName}`;
       
       const { error: uploadError } = await supabase.storage
@@ -94,6 +95,7 @@ export default function AdminNews() {
       setIsModalOpen(false);
       setEditingArticle(null);
       setSelectedFile(null);
+      setContentValue("");
       fetchArticles(); 
     } else {
       toast.error("Error saving news article: " + error.message);
@@ -101,31 +103,6 @@ export default function AdminNews() {
   }
 
 const [contentValue, setContentValue] = useState("");
-const contentRef = useRef<HTMLTextAreaElement | null>(null);
-
-function insertFormat(before: string, after = "") {
-  const textarea = contentRef.current;
-  if (!textarea) return;
-
-  const start = textarea.selectionStart;
-  const end = textarea.selectionEnd;
-  const selectedText = contentValue.substring(start, end);
-
-  const newText =
-    contentValue.substring(0, start) +
-    before +
-    selectedText +
-    after +
-    contentValue.substring(end);
-
-  setContentValue(newText);
-
-  setTimeout(() => {
-    textarea.focus();
-    textarea.selectionStart = start + before.length;
-    textarea.selectionEnd = end + before.length;
-  }, 0);
-}
 
   async function deleteArticle(id: string) {
     if (confirm("Are you sure you want to delete this article?")) {
@@ -184,10 +161,11 @@ function insertFormat(before: string, after = "") {
                 <div className="flex items-center justify-end gap-2 pt-4 border-t border-slate-100">
                   <button 
                     title="Edit" 
-                    onClick={() => {
-                      setEditingArticle(article);
-                      setIsModalOpen(true);
-                    }} 
+                   onClick={() => {
+  setEditingArticle(article);
+  setContentValue(article.content || "");
+  setIsModalOpen(true);
+}}
                     className="p-2 text-slate-400 hover:text-brand-primary rounded-md hover:bg-brand-primary/10 transition-colors"
                   >
                     <Edit className="h-4 w-4" />
@@ -249,67 +227,17 @@ function insertFormat(before: string, after = "") {
                   <textarea title="js" name="excerpt" required rows={2} defaultValue={editingArticle?.excerpt || ""} className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-brand-primary outline-none resize-none"></textarea>
                 </div>
 
-               <div>
+   
+
+ <div>
   <label className="block text-sm font-medium text-slate-700 mb-1">
     Full Content
   </label>
 
-  <div className="border border-slate-300 rounded-lg overflow-hidden">
-    <div className="bg-slate-50 border-b border-slate-300 p-2 flex items-center gap-1 flex-wrap">
-      <button type="button" onClick={() => insertFormat("**", "**")} className="px-2 py-1 hover:bg-slate-200 rounded font-bold">
-        B
-      </button>
-
-      <button type="button" onClick={() => insertFormat("*", "*")} className="px-2 py-1 hover:bg-slate-200 rounded italic">
-        I
-      </button>
-
-      <button type="button" onClick={() => insertFormat("<u>", "</u>")} className="px-2 py-1 hover:bg-slate-200 rounded underline">
-        U
-      </button>
-
-      <div className="w-px h-5 bg-slate-300 mx-1" />
-
-      <button type="button" onClick={() => insertFormat("\n# ")} className="px-2 py-1 hover:bg-slate-200 rounded text-xs font-bold">
-        H1
-      </button>
-
-      <button type="button" onClick={() => insertFormat("\n## ")} className="px-2 py-1 hover:bg-slate-200 rounded text-xs font-bold">
-        H2
-      </button>
-
-      <button type="button" onClick={() => insertFormat("\n\n")} className="px-2 py-1 hover:bg-slate-200 rounded text-xs">
-        Paragraph
-      </button>
-
-      <button type="button" onClick={() => insertFormat("\n- ")} className="px-2 py-1 hover:bg-slate-200 rounded text-xs">
-        Bullet
-      </button>
-
-      <button type="button" onClick={() => insertFormat("\n1. ")} className="px-2 py-1 hover:bg-slate-200 rounded text-xs">
-        Numbered
-      </button>
-
-      <button type="button" onClick={() => insertFormat("\n> ")} className="px-2 py-1 hover:bg-slate-200 rounded text-xs">
-        Quote
-      </button>
-
-      <button type="button" onClick={() => insertFormat("[", "](https://)") } className="px-2 py-1 hover:bg-slate-200 rounded text-xs">
-        Link
-      </button>
-    </div>
-
-    <textarea
-      ref={contentRef}
-      name="content"
-      required
-      rows={14}
-      value={contentValue}
-      onChange={(e) => setContentValue(e.target.value)}
-      placeholder="Write the full article content here..."
-      className="w-full px-4 py-3 outline-none resize-y"
-    />
-  </div>
+  <TiptapEditor
+    value={contentValue}
+    onChange={setContentValue}
+  />
 </div>
 
                 <div>

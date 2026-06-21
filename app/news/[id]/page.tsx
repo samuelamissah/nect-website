@@ -162,9 +162,9 @@ export default function ArticlePage({ params }: { params: Promise<{ id: string }
                   </div>
                 )}
 
-                <div className="prose prose-lg prose-slate max-w-none whitespace-pre-wrap leading-8">
-                  {article.content}
-                </div>
+                <div className="prose prose-lg prose-slate max-w-none whitespace-pre-wrap leading-8"
+                  dangerouslySetInnerHTML={{ __html: article.content }}
+                />
               </div>
             </div>
 

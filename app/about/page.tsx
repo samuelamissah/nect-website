@@ -66,14 +66,14 @@ export default function AboutPage() {
 
   const leadership = [
     {
-      name: "Ing. Yaa Obenewaa Okudzeto, FGhIE",
+      name: "Ing. Yaa Obenewaa Okudzeto",
       role: "Chairman",
       image: "/Yaa.jpeg",
       bio: "Electrical Engineer, Fellow of the Ghana Institution of Engineering (GhIE), and Executive Representative for Professional Engineers on the GhIE Council and Executive Committee. She is a leading advocate for infrastructure coordination, engineering standards, long-term national development planning, and effective implementation of public infrastructure projects across Ghana.",
-      credentials: "FGhIE"
+      credentials: ""
     },
     {
-      name: "Pln. Percy Anaab Bukari, FGIP, MCAP",
+      name: "Pln. Percy Anaab Bukari",
       role: "Vice Chairman",
       image: "/Percy.jpeg",
       bio: "President of the Ghana Institute of Planning (GIP), National Development Planning Commission (NDPC) Commissioner, and seasoned Monitoring & Evaluation Specialist. He is widely recognized for his contributions to urban development, spatial planning, local governance, and sustainable city management across Ghana and West Africa.",
