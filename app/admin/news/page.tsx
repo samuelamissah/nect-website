@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/app/lib/supabase";
 import { Plus, Image as ImageIcon, Trash2, Edit, XCircle, Loader2 } from "lucide-react";
+import { slugify } from "@/app/lib/slugify";
 import Image from "next/image";
 import toast from "react-hot-toast";
 import TiptapEditor from "@/app/components/TipTapEditor";
@@ -62,13 +63,15 @@ export default function AdminNews() {
       }
     }
     
+    const titleStr = String(form.get("title") || "");
     const articleData = {
-      title: form.get("title"),
+      title: titleStr,
       category: form.get("category"),
       excerpt: form.get("excerpt"),
       content: contentValue,
       featured: form.get("featured") === "on",
-      image_url: image_url
+      image_url: image_url,
+      slug: slugify(titleStr)
     };
 
    

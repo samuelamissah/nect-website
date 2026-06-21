@@ -18,6 +18,7 @@ import {
   Newspaper
 } from "lucide-react";
 import Image from "next/image";
+import { slugify } from "@/app/lib/slugify";
 import { useEffect, useState } from "react";
 
 // Define types for news articles
@@ -483,9 +484,9 @@ export default function HomePage() {
 
       {/* News & Media Centre */}
       <motion.section
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.2 }}
+        initial={false}
+        animate="visible"
+        variants={fadeInUp}
         className="mx-auto max-w-7xl px-5 py-24 lg:px-10"
       >
         <motion.div variants={fadeInUp} className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
@@ -503,8 +504,7 @@ export default function HomePage() {
         <motion.div 
           variants={staggerContainer}
           initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.1 }}
+          animate="visible"
           className="grid gap-8 md:grid-cols-3"
         >
           {newsArticles && newsArticles.length > 0 ? (
@@ -514,7 +514,7 @@ export default function HomePage() {
                 variants={fadeInUp}
                 whileHover={{ y: -8, transition: { duration: 0.2 } }}
               >
-                <Link href={`/news/${article.id}`} className="group flex flex-col bg-white border border-slate-200 rounded-sm overflow-hidden hover:border-brand-primary hover:shadow-lg transition-all">
+                  <Link href={`/news/${article.id}-${encodeURIComponent(slugify(article.title))}`} className="group flex flex-col bg-white border border-slate-200 rounded-sm overflow-hidden hover:border-brand-primary hover:shadow-lg transition-all">
                   {article.image_url ? (
                     <div className="h-48 relative overflow-hidden bg-slate-100">
                       <Image 

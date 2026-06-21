@@ -8,6 +8,7 @@ import Image from "next/image";
 import { useEffect, useState, use } from "react";
 import { supabase } from "@/app/lib/supabase";
 import { motion, Variants } from "framer-motion";
+import { slugify } from "@/app/lib/slugify";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -24,6 +25,18 @@ const fadeInLeft: Variants = {
 export default function ArticlePage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
 
+  // params.id may be either the raw id (UUID) or id+slug ("<uuid>-some-title").
+  const rawId = resolvedParams.id;
+  let id = rawId;
+  // If the param contains more than a UUID (UUIDs contain hyphens), try to extract a leading UUID.
+  const uuidMatch = String(rawId || '').match(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/);
+  if (uuidMatch) {
+    id = uuidMatch[0];
+  } else if (rawId && rawId.includes('-')) {
+    // Fallback for numeric ids or other formats: take prefix before first hyphen
+    id = rawId.split('-')[0];
+  }
+
   const [article, setArticle] = useState<any | null>(null);
   const [popularNews, setPopularNews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,7 +48,7 @@ export default function ArticlePage({ params }: { params: Promise<{ id: string }
       const { data: articleData } = await supabase
         .from("news")
         .select("*")
-        .eq("id", resolvedParams.id)
+        .eq("id", id)
         .single();
 
       if (articleData) setArticle(articleData);
@@ -43,7 +56,7 @@ export default function ArticlePage({ params }: { params: Promise<{ id: string }
       const { data: popularData } = await supabase
         .from("news")
         .select("id, title, created_at, category, image_url")
-        .neq("id", resolvedParams.id)
+        .neq("id", id)
         .order("created_at", { ascending: false })
         .limit(8);
 
@@ -178,10 +191,10 @@ export default function ArticlePage({ params }: { params: Promise<{ id: string }
                   <div className="space-y-4">
                     {popularNews.map((item) => (
                       <Link
-                        key={item.id}
-                        href={`/news/${item.id}`}
-                        className="block border-b border-slate-100 pb-4 last:border-b-0 last:pb-0 group"
-                      >
+                          key={item.id}
+                          href={`/news/${item.id}-${encodeURIComponent(slugify(item.title))}`}
+                          className="block border-b border-slate-100 pb-4 last:border-b-0 last:pb-0 group"
+                        >
                         <p className="text-sm font-bold text-slate-800 group-hover:text-brand-primary leading-snug line-clamp-2">
                           {item.title}
                         </p>
