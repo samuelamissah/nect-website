@@ -2,30 +2,55 @@
 
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
-import { Calendar, ArrowLeft, Loader2 } from "lucide-react";
+import { Calendar, ArrowLeft, Loader2, Share2, Bookmark } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState, use } from "react";
 import { supabase } from "@/app/lib/supabase";
+import { motion, Variants } from "framer-motion";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+const fadeInUp: Variants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+};
+
+const fadeInLeft: Variants = {
+  hidden: { opacity: 0, x: -30 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.5, ease: "easeOut" } },
+};
+
 export default function ArticlePage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
+
   const [article, setArticle] = useState<any | null>(null);
+  const [popularNews, setPopularNews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchArticle() {
-      const { data } = await supabase
+      setLoading(true);
+
+      const { data: articleData } = await supabase
         .from("news")
         .select("*")
         .eq("id", resolvedParams.id)
         .single();
-      
-      if (data) setArticle(data);
+
+      if (articleData) setArticle(articleData);
+
+      const { data: popularData } = await supabase
+        .from("news")
+        .select("id, title, created_at, category, image_url")
+        .neq("id", resolvedParams.id)
+        .order("created_at", { ascending: false })
+        .limit(8);
+
+      setPopularNews(popularData || []);
       setLoading(false);
     }
+
     fetchArticle();
   }, [resolvedParams.id]);
 
@@ -58,58 +83,142 @@ export default function ArticlePage({ params }: { params: Promise<{ id: string }
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 flex flex-col">
+    <main className="min-h-screen bg-slate-50 flex flex-col overflow-x-hidden">
       <Header />
-      
-      <article className="flex-1 py-12 lg:py-20">
-        <div className="mx-auto max-w-4xl px-5">
-          <Link href="/news" className="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-brand-primary transition-colors mb-10">
-            <ArrowLeft className="h-4 w-4" /> Back to News Room
-          </Link>
-          
-          <header className="mb-10">
-            <div className="flex items-center gap-4 mb-6">
-              <span className="inline-flex items-center rounded-sm bg-brand-primary/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-brand-primary">
-                {article.category || 'Update'}
-              </span>
-              <span className="flex items-center gap-1.5 text-sm font-medium text-slate-500">
-                <Calendar className="h-4 w-4" />
-                {new Date(article.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
-              </span>
-            </div>
+
+      <motion.article initial="hidden" animate="visible" className="flex-1 py-8 lg:py-12">
+        <div className="mx-auto max-w-7xl px-4 lg:px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-8">
             
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-slate-900 leading-tight mb-6">
-              {article.title}
-            </h1>
-            
-            <p className="text-xl text-slate-600 leading-relaxed font-medium">
-              {article.excerpt}
-            </p>
-          </header>
-          
-          {article.image_url && (
-            <div className="relative w-full aspect-[16/9] mb-12 rounded-2xl overflow-hidden shadow-lg border border-slate-200">
-              <Image src={article.image_url} alt={article.title} fill className="object-cover" />
-            </div>
-          )}
-          
-          <div className="prose prose-lg prose-slate max-w-none bg-white p-8 md:p-12 rounded-2xl border border-slate-200 shadow-sm whitespace-pre-wrap">
-            {article.content}
-          </div>
-          
-          <div className="mt-12 pt-8 border-t border-slate-200 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-brand-primary text-white flex items-center justify-center font-bold">
-                {article.author ? article.author.charAt(0) : 'A'}
+            <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+              <div className="p-6 md:p-10">
+                <motion.div variants={fadeInLeft}>
+                  <Link
+                    href="/news"
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-brand-primary mb-6"
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                    Back to News
+                  </Link>
+                </motion.div>
+
+                <motion.div variants={fadeInUp} className="flex flex-wrap items-center gap-3 mb-5">
+                  <span className="rounded bg-brand-primary/10 px-3 py-1 text-xs font-bold uppercase text-brand-primary">
+                    {article.category || "Update"}
+                  </span>
+
+                  <span className="flex items-center gap-1.5 text-sm text-slate-500">
+                    <Calendar className="h-4 w-4" />
+                    {new Date(article.created_at).toLocaleDateString(undefined, {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </span>
+                </motion.div>
+
+                <motion.h1
+                  variants={fadeInUp}
+                  className="text-3xl md:text-5xl font-extrabold text-slate-950 leading-tight mb-5"
+                >
+                  {article.title}
+                </motion.h1>
+
+                {article.excerpt && (
+                  <motion.p variants={fadeInUp} className="text-lg md:text-xl text-slate-600 leading-relaxed mb-6">
+                    {article.excerpt}
+                  </motion.p>
+                )}
+
+                <div className="flex items-center justify-between border-y border-slate-200 py-4 mb-8">
+                  <div>
+                    <p className="text-sm font-bold text-slate-900">
+                      By {article.author || "Admin"}
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      National Engineering Coordinating Team
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button title="Share" className="h-9 w-9 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center">
+                      <Share2 className="h-4 w-4 text-slate-600" />
+                    </button>
+                    <button title="Bookmark" className="h-9 w-9 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center">
+                      <Bookmark className="h-4 w-4 text-slate-600" />
+                    </button>
+                  </div>
+                </div>
+
+                {article.image_url && (
+                  <div className="relative w-full aspect-[16/9] mb-8 rounded-lg overflow-hidden border border-slate-200">
+                    <Image
+                      src={article.image_url}
+                      alt={article.title}
+                      fill
+                      className="object-cover"
+                      priority
+                    />
+                  </div>
+                )}
+
+                <div className="prose prose-lg prose-slate max-w-none whitespace-pre-wrap leading-8">
+                  {article.content}
+                </div>
               </div>
-              <div>
-                <p className="text-sm font-bold text-slate-900">Published by {article.author || 'Admin'}</p>
-                <p className="text-xs text-slate-500">National Engineering Coordinating Team</p>
-              </div>
             </div>
+
+            <aside className="space-y-6">
+              <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-5 sticky top-24">
+                <h3 className="text-lg font-extrabold text-slate-900 border-l-4 border-brand-primary pl-3 mb-4">
+                  Most Popular
+                </h3>
+
+                {popularNews.length > 0 ? (
+                  <div className="space-y-4">
+                    {popularNews.map((item) => (
+                      <Link
+                        key={item.id}
+                        href={`/news/${item.id}`}
+                        className="block border-b border-slate-100 pb-4 last:border-b-0 last:pb-0 group"
+                      >
+                        <p className="text-sm font-bold text-slate-800 group-hover:text-brand-primary leading-snug line-clamp-2">
+                          {item.title}
+                        </p>
+
+                        <div className="mt-2 flex items-center gap-2 text-xs text-slate-500">
+                          <Calendar className="h-3 w-3" />
+                          {new Date(item.created_at).toLocaleDateString(undefined, {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                          })}
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-slate-500">No other news available.</p>
+                )}
+              </div>
+
+              <div className="bg-brand-primary text-white rounded-xl p-6 shadow-sm">
+                <h3 className="text-lg font-extrabold mb-2">Stay Updated</h3>
+                <p className="text-sm text-white/80 mb-4">
+                  Get the latest news and updates from our newsroom.
+                </p>
+                <Link
+                  href="/news"
+                  className="inline-flex rounded-md bg-white px-4 py-2 text-sm font-bold text-brand-primary"
+                >
+                  View More News
+                </Link>
+              </div>
+            </aside>
+
           </div>
         </div>
-      </article>
+      </motion.article>
 
       <Footer />
     </main>

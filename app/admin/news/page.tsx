@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/app/lib/supabase";
 import { Plus, Image as ImageIcon, Video, Trash2, Edit, XCircle, Loader2 } from "lucide-react";
 import Image from "next/image";
@@ -65,10 +65,13 @@ export default function AdminNews() {
       title: form.get("title"),
       category: form.get("category"),
       excerpt: form.get("excerpt"),
-      content: form.get("content"),
+      content: contentValue,
       featured: form.get("featured") === "on",
       image_url: image_url
     };
+
+   
+
 
     let error;
     
@@ -97,6 +100,33 @@ export default function AdminNews() {
     }
   }
 
+const [contentValue, setContentValue] = useState("");
+const contentRef = useRef<HTMLTextAreaElement | null>(null);
+
+function insertFormat(before: string, after = "") {
+  const textarea = contentRef.current;
+  if (!textarea) return;
+
+  const start = textarea.selectionStart;
+  const end = textarea.selectionEnd;
+  const selectedText = contentValue.substring(start, end);
+
+  const newText =
+    contentValue.substring(0, start) +
+    before +
+    selectedText +
+    after +
+    contentValue.substring(end);
+
+  setContentValue(newText);
+
+  setTimeout(() => {
+    textarea.focus();
+    textarea.selectionStart = start + before.length;
+    textarea.selectionEnd = end + before.length;
+  }, 0);
+}
+
   async function deleteArticle(id: string) {
     if (confirm("Are you sure you want to delete this article?")) {
       await supabase.from("news").delete().eq("id", id);
@@ -111,9 +141,11 @@ export default function AdminNews() {
         <h1 className="text-2xl font-bold text-slate-900">News & Media Management</h1>
         <button 
           onClick={() => {
-            setEditingArticle(null);
-            setIsModalOpen(true);
-          }}
+  setEditingArticle(null);
+  setContentValue("");
+  setSelectedFile(null);
+  setIsModalOpen(true);
+}}
           className="flex items-center gap-2 px-4 py-2 rounded-lg bg-brand-primary text-white text-sm font-bold hover:bg-brand-primary/90 transition-colors"
         >
           <Plus className="h-4 w-4" />
@@ -217,24 +249,68 @@ export default function AdminNews() {
                   <textarea title="js" name="excerpt" required rows={2} defaultValue={editingArticle?.excerpt || ""} className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-brand-primary outline-none resize-none"></textarea>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Full Content</label>
-                  <div className="border border-slate-300 rounded-lg overflow-hidden">
-                    <div className="bg-slate-50 border-b border-slate-300 p-2 flex items-center gap-1 flex-wrap">
-                      {/* Rich Text Toolbar Mock */}
-                      <button type="button" className="p-1.5 hover:bg-slate-200 rounded text-slate-600 font-bold">B</button>
-                      <button type="button" className="p-1.5 hover:bg-slate-200 rounded text-slate-600 italic font-serif">I</button>
-                      <button type="button" className="p-1.5 hover:bg-slate-200 rounded text-slate-600 underline decoration-solid">U</button>
-                      <div className="w-px h-5 bg-slate-300 mx-1"></div>
-                      <button type="button" className="p-1.5 hover:bg-slate-200 rounded text-slate-600 font-bold text-xs">H1</button>
-                      <button type="button" className="p-1.5 hover:bg-slate-200 rounded text-slate-600 font-bold text-xs">H2</button>
-                      <div className="w-px h-5 bg-slate-300 mx-1"></div>
-                      <button type="button" className="p-1.5 hover:bg-slate-200 rounded text-slate-600 text-xs">List</button>
-                      <button type="button" className="p-1.5 hover:bg-slate-200 rounded text-slate-600 text-xs">Link</button>
-                    </div>
-                    <textarea name="content" required rows={12} defaultValue={editingArticle?.content || ""} placeholder="Write the article content here..." className="w-full px-4 py-3 outline-none resize-y"></textarea>
-                  </div>
-                </div>
+               <div>
+  <label className="block text-sm font-medium text-slate-700 mb-1">
+    Full Content
+  </label>
+
+  <div className="border border-slate-300 rounded-lg overflow-hidden">
+    <div className="bg-slate-50 border-b border-slate-300 p-2 flex items-center gap-1 flex-wrap">
+      <button type="button" onClick={() => insertFormat("**", "**")} className="px-2 py-1 hover:bg-slate-200 rounded font-bold">
+        B
+      </button>
+
+      <button type="button" onClick={() => insertFormat("*", "*")} className="px-2 py-1 hover:bg-slate-200 rounded italic">
+        I
+      </button>
+
+      <button type="button" onClick={() => insertFormat("<u>", "</u>")} className="px-2 py-1 hover:bg-slate-200 rounded underline">
+        U
+      </button>
+
+      <div className="w-px h-5 bg-slate-300 mx-1" />
+
+      <button type="button" onClick={() => insertFormat("\n# ")} className="px-2 py-1 hover:bg-slate-200 rounded text-xs font-bold">
+        H1
+      </button>
+
+      <button type="button" onClick={() => insertFormat("\n## ")} className="px-2 py-1 hover:bg-slate-200 rounded text-xs font-bold">
+        H2
+      </button>
+
+      <button type="button" onClick={() => insertFormat("\n\n")} className="px-2 py-1 hover:bg-slate-200 rounded text-xs">
+        Paragraph
+      </button>
+
+      <button type="button" onClick={() => insertFormat("\n- ")} className="px-2 py-1 hover:bg-slate-200 rounded text-xs">
+        Bullet
+      </button>
+
+      <button type="button" onClick={() => insertFormat("\n1. ")} className="px-2 py-1 hover:bg-slate-200 rounded text-xs">
+        Numbered
+      </button>
+
+      <button type="button" onClick={() => insertFormat("\n> ")} className="px-2 py-1 hover:bg-slate-200 rounded text-xs">
+        Quote
+      </button>
+
+      <button type="button" onClick={() => insertFormat("[", "](https://)") } className="px-2 py-1 hover:bg-slate-200 rounded text-xs">
+        Link
+      </button>
+    </div>
+
+    <textarea
+      ref={contentRef}
+      name="content"
+      required
+      rows={14}
+      value={contentValue}
+      onChange={(e) => setContentValue(e.target.value)}
+      placeholder="Write the full article content here..."
+      className="w-full px-4 py-3 outline-none resize-y"
+    />
+  </div>
+</div>
 
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">Media Upload</label>
