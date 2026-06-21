@@ -335,7 +335,7 @@ export default function ContactsPage() {
             className="bg-white rounded-2xl shadow-lg border border-slate-200 p-8"
           >
             <h2 className="text-2xl font-bold text-slate-900 mb-2">Send Us a Message</h2>
-            <p className="text-slate-600 mb-6">Fill in the form below and we'll get back to you as soon as possible.</p>
+            <p className="text-slate-600 mb-6">Fill in the form below and we&apos;ll get back to you as soon as possible.</p>
             
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
@@ -367,6 +367,8 @@ export default function ContactsPage() {
               <div>
                 <label className="block text-sm font-bold text-slate-700 mb-1.5">Subject <span className="text-red-500">*</span></label>
                 <select 
+                  id="subject"
+                  title="Select a subject for your message"
                   name="subject"
                   value={formData.subject}
                   onChange={handleChange}
