@@ -176,11 +176,7 @@ export default function HomePage() {
       <Header />
 
       {/* Hero Section */}
-      <motion.section 
-        initial="hidden"
-        animate="visible"
-        className="relative overflow-hidden px-5 py-12 lg:px-10 lg:py-20 border-b border-slate-200"
-      >
+      <section className="relative overflow-hidden px-5 py-12 lg:px-10 lg:py-20 border-b border-slate-200">
         <div className="absolute inset-0 z-0 bg-slate-50"></div>
         <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'linear-gradient(#1e3a8a 1px, transparent 1px), linear-gradient(90deg, #1e3a8a 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
 
@@ -203,7 +199,7 @@ export default function HomePage() {
 
             <motion.h1 
               variants={fadeInUp}
-              className="text-5xl font-extrabold leading-[1.1] tracking-tight text-slate-900 sm:text-6xl lg:text-6xl"
+              className="text-4xl font-extrabold leading-tight tracking-tight text-slate-900 sm:text-5xl lg:text-6xl"
             >
               {heroTitle}
             </motion.h1>
@@ -241,10 +237,7 @@ export default function HomePage() {
             </motion.div>
           </motion.div>
 
-          <motion.div 
-            variants={fadeInRight}
-            className="relative aspect-square w-full rounded-sm bg-slate-900 p-2 shadow-2xl overflow-hidden border border-slate-800"
-          >
+          <div className="relative h-[420px] lg:h-[560px] w-full rounded-sm bg-slate-900 p-2 shadow-2xl overflow-hidden border border-slate-800">
             <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'linear-gradient(#ffffff 1px, transparent 1px), linear-gradient(90deg, #ffffff 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
             <HeroScene />
             
@@ -290,9 +283,9 @@ export default function HomePage() {
                 ></motion.div>
               </div>
             </motion.div>
-          </motion.div>
+          </div>
         </div>
-      </motion.section>
+      </section>
 
       {/* Quick Actions Section */}
       <motion.section 
