@@ -41,19 +41,25 @@ export default function AdminVideos() {
        thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
     }
     
-    const { error } = await supabase.from("videos").insert({
-      title: form.get("title"),
-      description: form.get("description"),
-      category: form.get("category"),
-      video_url: videoUrl,
-      thumbnail_url: thumbnailUrl,
-    });
+    try {
+      const { error } = await supabase.from("videos").insert({
+        title: form.get("title"),
+        description: form.get("description"),
+        category: form.get("category"),
+        video_url: videoUrl,
+        thumbnail_url: thumbnailUrl,
+      });
 
-    if (!error) {
-      setIsModalOpen(false);
-      fetchVideos();
-    } else {
-      alert("Error saving video. Please ensure the videos table exists by running the setup SQL.");
+      if (!error) {
+        setIsModalOpen(false);
+        fetchVideos();
+      } else {
+        console.error("Video insert error:", error);
+        alert(`Error saving video: ${error.message}. Please ensure the videos table exists by running the setup SQL.`);
+      }
+    } catch (err: any) {
+      console.error("Video exception:", err);
+      alert(`Error saving video: ${err.message}`);
     }
   }
 
@@ -141,7 +147,7 @@ export default function AdminVideos() {
             <form onSubmit={handleSubmit} className="p-6 space-y-5">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Video Title</label>
-                <input title="js" required className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-brand-primary outline-none" />
+                <input name="title" title="js" required className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-brand-primary outline-none" />
               </div> 
               
               <div className="grid grid-cols-2 gap-4">
