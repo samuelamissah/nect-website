@@ -12,6 +12,14 @@ export default function AdminReports() {
   const [loading, setLoading] = useState(true);
   const [selectedReport, setSelectedReport] = useState<any | null>(null);
   const [notes, setNotes] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+const pageSize = 10;
+
+const totalPages = Math.ceil(reports.length / pageSize);
+const paginatedReports = reports.slice(
+  (currentPage - 1) * pageSize,
+  currentPage * pageSize
+);
 
   useEffect(() => {
     async function fetchReports() {
@@ -126,7 +134,7 @@ export default function AdminReports() {
               ) : reports.length === 0 ? (
                 <tr><td colSpan={6} className="px-6 py-12 text-center text-slate-500">No reports found.</td></tr>
               ) : (
-                reports.map((report) => (
+                paginatedReports.map((report) => (
                   <tr key={report.id} className="hover:bg-slate-50 transition-colors cursor-pointer" onClick={() => { setSelectedReport(report); setNotes(report.internal_notes || ""); }}>
                     <td className="px-6 py-4 font-mono font-medium text-brand-primary">{report.reference}</td>
                     <td className="px-6 py-4 font-semibold text-slate-700">{report.report_type}</td>
@@ -153,6 +161,31 @@ export default function AdminReports() {
               )}
             </tbody>
           </table>
+          {reports.length > pageSize && (
+  <div className="flex items-center justify-between px-6 py-4 border-t border-slate-200 bg-white">
+    <p className="text-sm text-slate-500">
+      Page {currentPage} of {totalPages}
+    </p>
+
+    <div className="flex gap-2">
+      <button
+        disabled={currentPage === 1}
+        onClick={() => setCurrentPage((p) => p - 1)}
+        className="px-3 py-1.5 rounded-lg border text-sm disabled:opacity-40"
+      >
+        Previous
+      </button>
+
+      <button
+        disabled={currentPage === totalPages}
+        onClick={() => setCurrentPage((p) => p + 1)}
+        className="px-3 py-1.5 rounded-lg border text-sm disabled:opacity-40"
+      >
+        Next
+      </button>
+    </div>
+  </div>
+)}
         </div>
       </div>
 
@@ -205,15 +238,44 @@ export default function AdminReports() {
                    </div>
                  </div>
 
-                 {selectedReport.photo_url && (
-                   <div>
-                     <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Attached Evidence</h3>
-                     <div className="rounded-xl overflow-hidden border border-slate-200 bg-slate-100 h-64 relative">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={selectedReport.photo_url} alt="Evidence" className="w-full h-full object-contain" />
-                     </div>
-                   </div>
-                 )}
+        {(() => {
+  const evidenceUrl =
+    selectedReport.video_url ||
+    selectedReport.photo_url ||
+    selectedReport.media_url ||
+    selectedReport.file_url;
+
+  if (!evidenceUrl) return null;
+
+  const isVideo =
+    /\.(mp4|webm|ogg|mov|m4v)$/i.test(evidenceUrl);
+
+  return (
+    <div>
+      <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">
+        Attached Evidence
+      </h3>
+
+      <div className="rounded-xl overflow-hidden border border-slate-200 bg-slate-100 h-72 relative">
+        {isVideo ? (
+          <video
+            src={evidenceUrl}
+            controls
+            playsInline
+            preload="metadata"
+            className="w-full h-full object-contain bg-black"
+          />
+        ) : (
+          <img
+            src={evidenceUrl}
+            alt="Evidence"
+            className="w-full h-full object-contain"
+          />
+        )}
+      </div>
+    </div>
+  );
+})()}
 
                  <div>
                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Reporter Info</h3>

@@ -4,6 +4,31 @@ import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import { HelpCircle, ChevronDown, MessageCircle } from "lucide-react";
 import { useState } from "react";
+import { motion, Variants, AnimatePresence } from "framer-motion";
+
+// Animation variants
+const fadeInUp: Variants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
+};
+
+const fadeInDown: Variants = {
+  hidden: { opacity: 0, y: -30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
+};
+
+const staggerContainer: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1 }
+  }
+};
+
+const scaleUp: Variants = {
+  hidden: { opacity: 0, scale: 0.9 },
+  visible: { opacity: 1, scale: 1, transition: { duration: 0.4, ease: "easeOut" } }
+};
 
 export default function FAQPage() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
@@ -55,75 +80,160 @@ export default function FAQPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-slate-50 flex flex-col">
+    <main className="min-h-screen bg-slate-50 flex flex-col overflow-x-hidden">
       <Header />
       
-      <section className="bg-white border-b border-slate-200">
-        <div className="mx-auto max-w-4xl px-5 py-16 lg:px-10 lg:py-24 text-center">
-          <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-brand-primary/10 mb-6">
+      {/* Hero Section */}
+      <motion.section 
+        initial="hidden"
+        animate="visible"
+        className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-b border-slate-800"
+      >
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 mix-blend-overlay"></div>
+        <div className="absolute top-0 right-0 -mr-20 -mt-20 h-96 w-96 rounded-full bg-brand-primary/20 blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 -ml-20 -mb-20 h-96 w-96 rounded-full bg-blue-500/10 blur-3xl"></div>
+        
+        <div className="relative z-10 mx-auto max-w-4xl px-5 py-16 lg:px-10 lg:py-24 text-center">
+          <motion.div 
+            variants={fadeInDown}
+            className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-brand-primary/20 mb-6"
+          >
             <HelpCircle className="h-8 w-8 text-brand-primary" />
-          </div>
-          <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 md:text-5xl">
+          </motion.div>
+          
+          <motion.h1 
+            variants={fadeInUp}
+            className="text-4xl font-extrabold tracking-tight text-white md:text-5xl"
+          >
             Frequently Asked Questions
-          </h1>
-          <p className="mt-6 text-lg leading-relaxed text-slate-600 max-w-2xl mx-auto">
+          </motion.h1>
+          
+          <motion.p 
+            variants={fadeInUp}
+            className="mt-6 text-lg leading-relaxed text-slate-300 max-w-2xl mx-auto"
+          >
             Find answers to common questions about NECT&apos;s operations, reporting procedures, and contractor compliance.
-          </p>
+          </motion.p>
         </div>
-      </section>
+      </motion.section>
 
+      {/* FAQ Content */}
       <section className="mx-auto max-w-4xl px-5 py-16 lg:px-10 lg:py-24 w-full flex-1">
-        <div className="space-y-12">
+        <motion.div 
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.1 }}
+          className="space-y-12"
+        >
           {faqs.map((section, sectionIdx) => (
-            <div key={sectionIdx}>
-              <h2 className="text-xl font-bold text-slate-900 mb-6 pb-2 border-b border-slate-200">
+            <motion.div key={sectionIdx} variants={fadeInUp}>
+              <motion.h2 
+                variants={fadeInUp}
+                className="text-xl font-bold text-slate-900 mb-6 pb-2 border-b border-slate-200"
+              >
                 {section.category}
-              </h2>
+              </motion.h2>
               <div className="space-y-4">
                 {section.questions.map((faq, faqIdx) => {
                   const globalIdx = sectionIdx * 100 + faqIdx;
                   const isOpen = openIndex === globalIdx;
                   
                   return (
-                    <div 
+                    <motion.div 
                       key={faqIdx} 
-                      className={`border rounded-xl overflow-hidden transition-colors ${isOpen ? 'border-brand-primary bg-white shadow-sm' : 'border-slate-200 bg-white hover:border-slate-300'}`}
+                      variants={fadeInUp}
+                      whileHover={{ scale: 1.01 }}
+                      className={`border rounded-xl overflow-hidden transition-all duration-300 ${
+                        isOpen 
+                          ? 'border-brand-primary bg-white shadow-md shadow-brand-primary/5' 
+                          : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm'
+                      }`}
                     >
-                      <button 
-                        className="w-full px-6 py-5 flex items-center justify-between text-left focus:outline-none"
+                      <motion.button 
+                        className="w-full px-6 py-5 flex items-center justify-between text-left focus:outline-none group"
                         onClick={() => setOpenIndex(isOpen ? null : globalIdx)}
+                        whileTap={{ scale: 0.99 }}
                       >
-                        <span className="font-bold text-slate-900 pr-4">{faq.q}</span>
-                        <ChevronDown className={`h-5 w-5 text-slate-400 shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180 text-brand-primary' : ''}`} />
-                      </button>
-                      <div 
-                        className={`px-6 overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-96 pb-5 opacity-100' : 'max-h-0 opacity-0'}`}
-                      >
-                        <p className="text-slate-600 leading-relaxed pt-2 border-t border-slate-100">
-                          {faq.a}
-                        </p>
-                      </div>
-                    </div>
+                        <span className={`font-bold pr-4 transition-colors ${
+                          isOpen ? 'text-brand-primary' : 'text-slate-900 group-hover:text-brand-primary'
+                        }`}>
+                          {faq.q}
+                        </span>
+                        <motion.div
+                          animate={{ rotate: isOpen ? 180 : 0 }}
+                          transition={{ duration: 0.3 }}
+                        >
+                          <ChevronDown className={`h-5 w-5 shrink-0 transition-colors ${
+                            isOpen ? 'text-brand-primary' : 'text-slate-400'
+                          }`} />
+                        </motion.div>
+                      </motion.button>
+                      
+                      <AnimatePresence>
+                        {isOpen && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.3, ease: "easeInOut" }}
+                            className="overflow-hidden"
+                          >
+                            <div className="px-6 pb-5">
+                              <p className="text-slate-600 leading-relaxed pt-2 border-t border-slate-100">
+                                {faq.a}
+                              </p>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </motion.div>
                   );
                 })}
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
-        <div className="mt-20 bg-slate-900 rounded-3xl p-8 md:p-12 text-center relative overflow-hidden">
+        {/* CTA Section */}
+        <motion.div 
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.3, duration: 0.5 }}
+          whileHover={{ scale: 1.01 }}
+          className="mt-20 bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-8 md:p-12 text-center relative overflow-hidden"
+        >
           <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'linear-gradient(#ffffff 1px, transparent 1px), linear-gradient(90deg, #ffffff 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
+          <div className="absolute top-0 right-0 -mr-20 -mt-20 h-96 w-96 rounded-full bg-brand-primary/10 blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 -ml-20 -mb-20 h-96 w-96 rounded-full bg-blue-500/10 blur-3xl"></div>
+          
           <div className="relative z-10">
-            <MessageCircle className="h-10 w-10 text-brand-accent mx-auto mb-4" />
-            <h3 className="text-2xl font-bold text-white mb-3">Still have questions?</h3>
+            <motion.div
+              animate={{ 
+                scale: [1, 1.1, 1],
+                rotate: [0, 5, -5, 0]
+              }}
+              transition={{ duration: 3, repeat: Infinity }}
+              className="flex justify-center"
+            >
+              <MessageCircle className="h-12 w-12 text-brand-primary" />
+            </motion.div>
+            
+            <h3 className="text-2xl font-bold text-white mb-3 mt-4">Still have questions?</h3>
             <p className="text-slate-300 mb-8 max-w-lg mx-auto">
               If you couldn&apos;t find the answer you were looking for, please reach out to our support team directly.
             </p>
-            <a href="mailto:info@nect.gov.gh" className="inline-flex items-center gap-2 px-8 py-3 bg-brand-accent text-slate-900 font-bold rounded-lg hover:bg-brand-accent/90 transition-colors">
+            <motion.a 
+              href="mailto:info@nect.gov.gh"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="inline-flex items-center gap-2 px-8 py-3 bg-amber-400 text-slate-900 font-bold rounded-lg hover:bg-amber-300 transition-colors"
+            >
               Contact Support
-            </a>
+            </motion.a>
           </div>
-        </div>
+        </motion.div>
       </section>
 
       <Footer />
