@@ -8,6 +8,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { supabase } from "@/app/lib/supabase";
 import { motion, Variants } from "framer-motion";
+import { slugify } from "../lib/slugify";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -182,7 +183,8 @@ export default function NewsPage() {
                   </p>
                   
                   <motion.div whileHover={{ x: 4 }}>
-                    <Link href={`/news/${featuredPost.id}`} className="inline-flex items-center gap-2 text-brand-primary font-bold hover:gap-3 transition-all">
+                    <Link href={`/news/${featuredPost.id}-${encodeURIComponent(featuredPost.slug || slugify(featuredPost.title))}`}
+                    className="inline-flex items-center gap-2 text-brand-primary font-bold hover:gap-3 transition-all">
                       Read Full Release <ArrowRight className="h-4 w-4" />
                     </Link>
                   </motion.div>
@@ -228,7 +230,10 @@ export default function NewsPage() {
                       </div>
                       
                       <h3 className="text-xl font-bold text-slate-900 mb-4 group-hover:text-brand-primary transition-colors">
-                        <Link href={`/news/${post.id}`} className="focus:outline-none">
+                        <Link
+  href={`/news/${post.id}-${encodeURIComponent(post.slug || slugify(post.title))}`}
+  className="focus:outline-none"
+>
                           <span className="absolute inset-0" aria-hidden="true" />
                           {post.title}
                         </Link>
@@ -248,6 +253,7 @@ export default function NewsPage() {
                   </motion.div>
                 ))}
               </motion.div>
+
             )}
             
             {regularPosts.length > 0 && (

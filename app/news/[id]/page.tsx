@@ -1,15 +1,18 @@
 "use client";
 
+import { useEffect, useState, use } from "react";
+import { useRouter } from "next/navigation";
+import { motion, Variants } from "framer-motion";
+import { supabase } from "@/app/lib/supabase";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
-import { Calendar, ArrowLeft, Loader2, Share2, Bookmark } from "lucide-react";
+import { Calendar, ArrowLeft, Bookmark, Loader2 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState, use } from "react";
-import { useRouter } from 'next/navigation';
-import { supabase } from "@/app/lib/supabase";
-import { motion, Variants } from "framer-motion";
+import { notFound, redirect } from "next/navigation";
 import { slugify } from "@/app/lib/slugify";
+import Head from "next/head";
+import ShareArticle from '@/app/components/ShareArticle';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -121,6 +124,38 @@ export default function ArticlePage({ params }: { params: Promise<{ id: string }
 
   return (
     <main className="min-h-screen bg-slate-50 flex flex-col overflow-x-hidden">
+      <Head>
+        <title>{article?.title ? `${article.title} | NECT` : 'News | NECT'}</title>
+        <meta name="description" content={article?.excerpt || 'News from NECT'} />
+        <link rel="canonical" href={`/news/${id}-${encodeURIComponent(article?.slug || '')}`} />
+
+        {/* Open Graph */}
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content={article?.title || 'NECT News'} />
+        <meta property="og:description" content={article?.excerpt || ''} />
+        {(article?.og_image_url || article?.image_url) && (
+          <meta property="og:image" content={article.og_image_url || article.image_url} />
+        )}
+
+        {/* JSON-LD structured data for article */}
+        {article && (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "NewsArticle",
+              "headline": article.title,
+              "image": article.og_image_url || article.image_url ? [article.og_image_url || article.image_url] : undefined,
+              "datePublished": article.created_at,
+              "author": {
+                "@type": "Organization",
+                "name": "National Engineering Coordinating Team"
+              },
+              "description": article.excerpt
+            }) }}
+          />
+        )}
+      </Head>
       <Header />
 
       <motion.article initial="hidden" animate="visible" className="flex-1 py-8 lg:py-12">
@@ -178,9 +213,9 @@ export default function ArticlePage({ params }: { params: Promise<{ id: string }
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <button title="Share" className="h-9 w-9 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center">
-                      <Share2 className="h-4 w-4 text-slate-600" />
-                    </button>
+                    <div className="hidden md:block">
+                      <ShareArticle url={typeof window !== 'undefined' ? window.location.href : `/news/${id}-${encodeURIComponent(article.slug)}`} title={article.title} />
+                    </div>
                     <button title="Bookmark" className="h-9 w-9 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center">
                       <Bookmark className="h-4 w-4 text-slate-600" />
                     </button>

@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { supabase } from "@/app/lib/supabase";
+import { v4 as uuidv4 } from 'uuid';
+import { addQueuedReport } from '@/app/lib/offlineQueue';
 import { Loader2, CheckCircle2, User, UserX, Camera, MapPin, AlignLeft, Info, Crosshair, Search } from "lucide-react";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -114,22 +116,48 @@ export default function ReportForm() {
       100000 + Math.random() * 900000
     )}`;
 
-    const { error } = await supabase.from("reports").insert({
-      reference: ref,
-      report_type: form.get("report_type"),
-      anonymous,
-      full_name: anonymous ? null : form.get("full_name"),
-      phone: anonymous ? null : form.get("phone"),
-      email: anonymous ? null : form.get("email"),
-      location: form.get("location"),
-      description: form.get("description"),
-      photo_url: photoUrl,
-      status: 'Submitted'
-    });
+    // If offline, queue the report locally and return success to user
+    if (!navigator.onLine) {
+      const queued = {
+        id: uuidv4(),
+        reference: ref,
+        report_type: form.get("report_type"),
+        anonymous,
+        full_name: anonymous ? null : form.get("full_name"),
+        phone: anonymous ? null : form.get("phone"),
+        email: anonymous ? null : form.get("email"),
+        location: form.get("location"),
+        description: form.get("description"),
+        photo_url: photoUrl,
+        status: 'Queued',
+        created_at: new Date().toISOString()
+      };
 
-    if (error) {
-      alert(error.message);
+      try {
+        await addQueuedReport(queued);
+        setReference(ref);
+        setFileName(null);
+        try { (event.target as HTMLFormElement).reset(); } catch (e) {}
+      } catch (err) {
+        alert('Failed to queue report offline: ' + String(err));
+      }
     } else {
+      const { error } = await supabase.from("reports").insert({
+        reference: ref,
+        report_type: form.get("report_type"),
+        anonymous,
+        full_name: anonymous ? null : form.get("full_name"),
+        phone: anonymous ? null : form.get("phone"),
+        email: anonymous ? null : form.get("email"),
+        location: form.get("location"),
+        description: form.get("description"),
+        photo_url: photoUrl,
+        status: 'Submitted'
+      });
+
+      if (error) {
+        alert(error.message);
+      } else {
       // Trigger email notification if user provided an email
       if (!anonymous && form.get("email")) {
         try {
@@ -149,12 +177,9 @@ export default function ReportForm() {
         }
       }
       
-      setReference(ref);
-      setFileName(null);
-      try {
-        (event.target as HTMLFormElement).reset();
-      } catch (e) {
-        console.error("Form reset error:", e);
+        setReference(ref);
+        setFileName(null);
+        try { (event.target as HTMLFormElement).reset(); } catch (e) {}
       }
     }
 

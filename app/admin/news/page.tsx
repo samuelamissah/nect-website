@@ -64,14 +64,16 @@ export default function AdminNews() {
     }
     
     const titleStr = String(form.get("title") || "");
+    const excerpt = String(form.get("excerpt") || "");
+    const category = String(form.get("category") || "News");
     const articleData = {
       title: titleStr,
-      category: form.get("category"),
-      excerpt: form.get("excerpt"),
+      category,
+      excerpt,
       content: contentValue,
       featured: form.get("featured") === "on",
       image_url: image_url,
-      slug: slugify(titleStr)
+      slug: slugify(titleStr),
     };
 
    

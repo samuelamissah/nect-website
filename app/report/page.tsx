@@ -1,6 +1,9 @@
 import ReportForm from "@/app/components/ReportForm";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
+import dynamic from 'next/dynamic';
+const QueueProcessor = dynamic(() => import('@/app/components/QueueProcessor'), { ssr: false });
+const ReportMap = dynamic(() => import('@/app/components/ReportMap'), { ssr: false });
 import { ArrowRight, FileText, Search, ClipboardCheck, Users, Map, ShieldCheck, CheckCircle2 } from "lucide-react";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -58,8 +61,17 @@ export default function ReportPage() {
         <Workflow />
 
         <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/40 md:p-10">
-          <ReportForm />
+          <div className="grid gap-8 lg:grid-cols-2">
+            <div>
+              <ReportForm />
+            </div>
+            <div>
+              <h3 className="mb-4 text-sm font-bold text-slate-700">Nearby Reports</h3>
+              <ReportMap />
+            </div>
+          </div>
         </div>
+        <QueueProcessor />
       </div>
       <Footer />
     </main>

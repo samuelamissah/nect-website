@@ -1,6 +1,8 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
+import PageTransition from "@/app/components/PageTransition";
+import RegisterServiceWorker from "@/app/components/RegisterServiceWorker";
 
 const plusJakarta = Plus_Jakarta_Sans({ subsets: ["latin"] });
 
@@ -20,17 +22,29 @@ export const metadata: Metadata = {
     "Engineering coordination",
     "Infrastructure management Ghana",
   ],
+  manifest: "/manifest.json",
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0f172a",
 };
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
-}) { 
+}) {
   return (
     <html lang="en" className="scroll-smooth" data-scroll-behavior="smooth">
-      <body className={`${plusJakarta.className} antialiased text-slate-900 bg-slate-50`}>
-        {children}
+      <body
+        className={`${plusJakarta.className} antialiased text-slate-900 bg-slate-50`}
+      >
+        <RegisterServiceWorker />
+        <PageTransition>{children}</PageTransition>
       </body>
     </html>
   );
