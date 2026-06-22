@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 import { supabase } from "@/app/lib/supabase";
-import { v4 as uuidv4 } from 'uuid';
-import { addQueuedReport } from '@/app/lib/offlineQueue';
 import { Loader2, CheckCircle2, User, UserX, Camera, MapPin, AlignLeft, Info, Crosshair, Search } from "lucide-react";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -19,6 +17,7 @@ export default function ReportForm() {
   const [trackResult, setTrackResult] = useState<any>(null);
   const [trackLoading, setTrackLoading] = useState(false);
   const [locationLoading, setLocationLoading] = useState(false);
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
 
   const handleGetLocation = () => {
     if (navigator.geolocation) {
@@ -28,6 +27,7 @@ export default function ReportForm() {
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
           const locationInput = document.querySelector('input[name="location"]') as HTMLInputElement;
+          setCoords({ lat, lng });
           
           if (locationInput) {
             locationInput.value = "Fetching address...";
@@ -119,7 +119,7 @@ export default function ReportForm() {
     // If offline, queue the report locally and return success to user
     if (!navigator.onLine) {
       const queued = {
-        id: uuidv4(),
+        id: crypto.randomUUID ? crypto.randomUUID() : `temp-${Date.now()}`,
         reference: ref,
         report_type: form.get("report_type"),
         anonymous,
@@ -130,11 +130,16 @@ export default function ReportForm() {
         description: form.get("description"),
         photo_url: photoUrl,
         status: 'Queued',
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
+        lat: coords?.lat ?? null,
+        lng: coords?.lng ?? null
       };
 
       try {
-        await addQueuedReport(queued);
+        // Implement local queuing using localStorage for offline persistence
+        const existingQueued = JSON.parse(localStorage.getItem('queuedReports') || '[]');
+        existingQueued.push(queued);
+        localStorage.setItem('queuedReports', JSON.stringify(existingQueued));
         setReference(ref);
         setFileName(null);
         try { (event.target as HTMLFormElement).reset(); } catch (e) {}
@@ -152,7 +157,9 @@ export default function ReportForm() {
         location: form.get("location"),
         description: form.get("description"),
         photo_url: photoUrl,
-        status: 'Submitted'
+        status: 'Submitted',
+        lat: coords?.lat ?? null,
+        lng: coords?.lng ?? null
       });
 
       if (error) {

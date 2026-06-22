@@ -240,9 +240,10 @@ const [contentValue, setContentValue] = useState("");
   </label>
 
   <TiptapEditor
-    value={contentValue}
-    onChange={setContentValue}
-  />
+  key={editingArticle?.id || "new-article"}
+  value={contentValue}
+  onChange={setContentValue}
+/>
 </div>
 
                 <div>

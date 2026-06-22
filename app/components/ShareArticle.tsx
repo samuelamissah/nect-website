@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Copy, Share } from 'lucide-react';
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 export default function ShareArticle({ url, title }: { url: string; title?: string }) {
   const [copied, setCopied] = useState(false);

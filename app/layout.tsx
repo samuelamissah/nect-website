@@ -43,7 +43,7 @@ export default function RootLayout({
       <body
         className={`${plusJakarta.className} antialiased text-slate-900 bg-slate-50`}
       >
-        <RegisterServiceWorker />
+        
         <PageTransition>{children}</PageTransition>
       </body>
     </html>
