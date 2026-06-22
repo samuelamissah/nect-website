@@ -1,4 +1,4 @@
-import { ImageResponse } from "next/server";
+import { ImageResponse } from "next/og";
 
 export function createArticleOgImage(article: { title: string; excerpt?: string; category?: string }) {
   return new ImageResponse(

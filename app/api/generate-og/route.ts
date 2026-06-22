@@ -30,12 +30,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, error: uploadError.message }, { status: 500 });
     }
 
-    const { data: urlData, error: urlError } = await supabaseAdmin.storage
+    const { data: urlData } = supabaseAdmin.storage
       .from("nect-media")
       .getPublicUrl(filePath);
 
-    if (urlError || !urlData?.publicUrl) {
-      return NextResponse.json({ ok: false, error: urlError?.message || "Could not get public URL." }, { status: 500 });
+    if (!urlData?.publicUrl) {
+      return NextResponse.json({ ok: false, error: "Could not get public URL." }, { status: 500 });
     }
 
     return NextResponse.json({ ok: true, ogImageUrl: urlData.publicUrl });

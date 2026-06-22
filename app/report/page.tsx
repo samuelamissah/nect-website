@@ -1,9 +1,8 @@
 import ReportForm from "@/app/components/ReportForm";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
-import dynamic from 'next/dynamic';
-const QueueProcessor = dynamic(() => import('@/app/components/QueueProcessor'), { ssr: false });
-const ReportMap = dynamic(() => import('@/app/components/ReportMap'), { ssr: false });
+import ReportMapWrapper from "@/app/components/ReportMapWrapper";
+import QueueProcessorWrapper from "@/app/components/QueueProcessorWrapper";
 import { ArrowRight, FileText, Search, ClipboardCheck, Users, Map, ShieldCheck, CheckCircle2 } from "lucide-react";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -67,11 +66,11 @@ export default function ReportPage() {
             </div>
             <div>
               <h3 className="mb-4 text-sm font-bold text-slate-700">Nearby Reports</h3>
-              <ReportMap />
+              <ReportMapWrapper />
             </div>
           </div>
         </div>
-        <QueueProcessor />
+        <QueueProcessorWrapper />
       </div>
       <Footer />
     </main>
