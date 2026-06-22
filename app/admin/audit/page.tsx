@@ -10,10 +10,36 @@ export default function AdminAudit() {
   const [logs, setLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchLogs();
-  }, []);
 
+  useEffect(() => {
+    // Define fetchLogs inside useEffect to fix the "access before declaration" error
+    async function fetchLogs() {
+      setLoading(true);
+      // In a real app we fetch from 'audit_logs', for demo we will show some mock ones if empty
+      const { data } = await supabase
+        .from("audit_logs")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(50);
+      
+      if (data && data.length > 0) {
+        setLogs(data);
+      } else {
+        // Mock logs to show how it looks
+        setLogs([
+          { id: '1', user_name: 'Admin', action: 'Published Article', module: 'News', ip_address: '192.168.1.1', created_at: new Date().toISOString() },
+          { id: '2', user_name: 'Admin', action: 'Updated Report Status to Resolved', module: 'Reports', ip_address: '192.168.1.1', created_at: new Date(Date.now() - 3600000).toISOString() },
+          { id: '3', user_name: 'Admin', action: 'Logged In', module: 'Auth', ip_address: '192.168.1.1', created_at: new Date(Date.now() - 7200000).toISOString() },
+          { id: '4', user_name: 'System', action: 'Automated Backup Completed', module: 'System', ip_address: 'localhost', created_at: new Date(Date.now() - 86400000).toISOString() },
+        ]);
+      }
+      setLoading(false);
+    }
+    
+    fetchLogs();
+
+  }, []);
+  
   async function fetchLogs() {
     setLoading(true);
     // In a real app we fetch from 'audit_logs', for demo we will show some mock ones if empty
@@ -36,6 +62,7 @@ export default function AdminAudit() {
     }
     setLoading(false);
   }
+  
 
   return (
     <div className="space-y-6">

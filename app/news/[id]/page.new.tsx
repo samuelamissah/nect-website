@@ -36,10 +36,16 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
 
   const canonicalSlug = article.slug || slugify(article.title || "");
   const canonicalPath = `/news/${id}-${encodeURIComponent(canonicalSlug)}`;
+
   const pageUrl = new URL(
     canonicalPath,
     process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
   ).toString();
+
+  const ogImageUrl =
+    article.og_image_url ||
+    article.image_url ||
+    new URL(`/news/${id}/opengraph-image`, process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000").toString();
 
   return {
     title: `${article.title} | NECT`,
@@ -52,10 +58,20 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
       title: article.title,
       description: article.excerpt || "",
       url: pageUrl,
-      images:
-        article.og_image_url || article.image_url
-          ? [article.og_image_url || article.image_url]
-          : [],
+      images: [
+        {
+          url: ogImageUrl,
+          width: 1200,
+          height: 630,
+          alt: article.title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: article.title,
+      description: article.excerpt || "",
+      images: [ogImageUrl],
     },
   };
 }
@@ -97,7 +113,7 @@ export default async function ArticlePage({ params }: { params: { id: string } }
     <main className="min-h-screen bg-slate-50 flex flex-col overflow-x-hidden">
       <Header />
 
-      {/* your article JSX continues here */}
+      
 
       <Footer />
     </main>
