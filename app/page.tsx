@@ -95,6 +95,7 @@ export default function HomePage() {
   const [contentMap, setContentMap] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
 
+
   useEffect(() => {
     async function fetchData() {
       try {
@@ -128,6 +129,12 @@ export default function HomePage() {
 
     fetchData();
   }, []);
+
+
+  if (loading) {
+  return null;
+}
+  
 
   // Default values fallback
   const heroTitle = contentMap.hero_title || "Protecting Ghana's Infrastructure Through Engineering Coordination.";
@@ -521,6 +528,7 @@ export default function HomePage() {
                         src={article.image_url} 
                         alt={article.title}
                         fill 
+                        priority
                         sizes="(max-width: 768px) 100vw, 33vw" 
                         className="object-cover transition-transform duration-500 group-hover:scale-105" 
                       />
