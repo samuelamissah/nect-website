@@ -21,6 +21,18 @@ const FacebookIcon = () => (
   </svg>
 );
 
+const TikTokIcon = () => (
+  <svg
+    className="h-4 w-4"
+    fill="currentColor"
+    viewBox="0 0 24 24"
+    aria-hidden="true"
+  >
+    <path d="M16.6 5.82A5.53 5.53 0 0 1 13.3 2h-2.9v13.24a2.64 2.64 0 1 1-2.64-2.64c.18 0 .35.02.52.05v-2.96a5.64 5.64 0 0 0-.52-.02A5.6 5.6 0 1 0 13.36 15V8.3a8.36 8.36 0 0 0 4.87 1.56V6.96c-.59 0-1.15-.14-1.63-.41z" />
+  </svg>
+);
+
+
 const YoutubeIcon = () => (
   <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
     <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
@@ -45,28 +57,28 @@ export default function Footer() {
             
             <div className="mt-8 flex items-center gap-3">
               <a 
-                href="/twitter" 
+                href="https://x.com/EngineeringCoor" 
                 className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition-colors hover:bg-[#1DA1F2] hover:text-white"
                 aria-label="Twitter"
               >
                 <TwitterIcon />
               </a>
               <a 
-                href="/linkedin" 
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition-colors hover:bg-[#0A66C2] hover:text-white"
-                aria-label="LinkedIn"
+                href="https://www.tiktok.com/@nect_ghana" 
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition-colors hover:bg-black hover:text-white"
+                aria-label="TikTok"
               >
-                <LinkedInIcon />
+                <TikTokIcon />
               </a>
               <a 
-                href="/facebook" 
+                href="https://en-gb.facebook.com/NECTGhana/" 
                 className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition-colors hover:bg-[#1877F2] hover:text-white"
                 aria-label="Facebook"
               >
                 <FacebookIcon />
               </a>
               <a 
-                href="/youtube" 
+                href="https://www.youtube.com/@NationalEngineeringCoordinatin" 
                 className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition-colors hover:bg-[#FF0000] hover:text-white"
                 aria-label="YouTube"
               >

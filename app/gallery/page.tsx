@@ -116,19 +116,19 @@ export default function GalleryPage() {
 
       {/* Lightbox Modal */}
       {selectedMedia && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4 md:p-10" onClick={() => setSelectedMedia(null)}>
-          <button title="Close Modal" className="absolute top-6 right-6 text-white/70 hover:text-white transition-colors" onClick={() => setSelectedMedia(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4 md:p-10 overflow-hidden" onClick={() => setSelectedMedia(null)}>
+          <button title="Close Modal" className="absolute top-6 right-6 text-white/70 hover:text-white transition-colors z-10" onClick={() => setSelectedMedia(null)}>
             <XCircle className="h-10 w-10" />
           </button>
-          <div className="relative max-w-5xl w-full max-h-full flex flex-col items-center" onClick={(e) => e.stopPropagation()}>
+          <div className="relative w-full max-w-5xl max-h-[calc(100vh-2rem)] overflow-y-auto flex flex-col items-center px-1 pb-6" onClick={(e) => e.stopPropagation()}>
             {selectedMedia.media_type === 'image' ? (
-              <img src={selectedMedia.media_url} alt={selectedMedia.title} className="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl" />
+              <img src={selectedMedia.media_url} alt={selectedMedia.title} className="max-w-full max-h-[75vh] object-contain rounded-lg shadow-2xl" />
             ) : (
-              <video src={selectedMedia.media_url} controls autoPlay className="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl bg-black w-full" />
+              <video src={selectedMedia.media_url} controls autoPlay className="max-w-full max-h-[75vh] object-contain rounded-lg shadow-2xl bg-black w-full" />
             )}
-            <div className="mt-6 text-center text-white max-w-2xl">
-              <h2 className="text-2xl font-bold mb-2">{selectedMedia.title}</h2>
-              {selectedMedia.description && <p className="text-white/70">{selectedMedia.description}</p>}
+            <div className="mt-6 w-full max-w-2xl rounded-xl bg-white/10 p-4 text-left text-white backdrop-blur-sm sm:text-center">
+              <h2 className="text-2xl font-bold mb-2 break-words whitespace-pre-wrap">{selectedMedia.title}</h2>
+              {selectedMedia.description && <p className="text-white/80 leading-relaxed break-words whitespace-pre-wrap">{selectedMedia.description}</p>}
             </div>
           </div>
         </div>
